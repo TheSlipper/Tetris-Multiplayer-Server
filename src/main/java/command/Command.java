@@ -1,0 +1,23 @@
+package command;
+
+import java.util.StringTokenizer;
+
+public abstract class Command {
+
+    private String commandName;
+
+    public Command(String cmdName) {
+        this.commandName = cmdName;
+    }
+
+    protected abstract void loadFlags(StringTokenizer cmdTokenizer);
+
+    public abstract boolean execute(StringTokenizer cmdTokenizer);
+
+    protected abstract void clearFlags();
+
+    public String getCommandName() {
+        return this.commandName;
+    }
+
+}
