@@ -5,6 +5,7 @@ import management.CommandManager;
 
 import java.util.StringTokenizer;
 
+// TODO: 1. Fix the ip output
 public class List extends Command {
 
     private boolean cmdFlag = true;
