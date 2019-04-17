@@ -7,6 +7,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+// TODO: SU mode
+
 public class Server {
 
     private static SessionManager sessionManager;
@@ -14,6 +16,10 @@ public class Server {
     private static DBQueryManager queryManager;
 
     private static CommandManager cmdManager;
+
+    private static String username = "slipper"; // TODO: Load from database
+
+    private static boolean rootMode = false;
 
     private static void initServer() {
         try {
@@ -45,7 +51,11 @@ public class Server {
         while (true) {
             Scanner sc = new Scanner(System.in);
             String cmd;
-            System.out.print(">");
+            System.out.print("tetris-mp: ");
+            if (!Server.rootMode)
+                System.out.print(Server.username + "$ ");
+            else
+                System.out.print("root$ ");
             cmd = sc.nextLine();
             if (!cmdManager.manageCommand(cmd))
                 System.err.println("Unkown command [" + cmd + "]:");

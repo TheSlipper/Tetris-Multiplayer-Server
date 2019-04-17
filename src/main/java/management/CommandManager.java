@@ -2,9 +2,12 @@ package management;
 
 import command.*;
 
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 public class CommandManager {
+
+    private final String lineDelim = "&&";
 
     public static Command[] commandArr = {
             new List("list"),
@@ -24,11 +27,28 @@ public class CommandManager {
     private void initCmdSession() {
     }
 
+    private ArrayList<StringTokenizer> lexIt(String cmd) {
+        StringTokenizer stAnd = new StringTokenizer(cmd, lineDelim);
+        int len = 0;
+        ArrayList<StringTokenizer> cmds = new ArrayList<StringTokenizer>();
+        while (stAnd.hasMoreTokens()) {
+            cmds.add(new StringTokenizer(stAnd.nextToken()));
+            len++;
+        }
+
+        return cmds;
+    }
+
     public boolean manageCommand(String cmd) {
         Command cmdTemp = null;
-        StringTokenizer cmdTokenizer = new StringTokenizer(cmd);
-        if ((cmdTemp = this.hasCommand(cmdTokenizer.nextToken())) == null)
-            return false;
-        return cmdTemp.execute(cmdTokenizer);
+        ArrayList<StringTokenizer> cmds = this.lexIt(cmd);
+        for (StringTokenizer st : cmds) {
+            if ((cmdTemp = this.hasCommand(st.nextToken())) == null)
+                return false;
+            if (!cmdTemp.execute(st))
+                return false;
+        }
+
+        return true;
     }
 }
