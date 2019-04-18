@@ -26,6 +26,7 @@ public class Shutdown extends Command {
             if (token.startsWith("-")) {
                 if (token.contains("n")) // n - now
                     this.nowFlag = true;
+            } else if (token.startsWith("--")) {
                 if (token.contains("t")) { // t - specified time
                     this.specifiedTimeFlag = true;
                     this.shutdownTime = Integer.parseInt(cmdTokenizer.nextToken());

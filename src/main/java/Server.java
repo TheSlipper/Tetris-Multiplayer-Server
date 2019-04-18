@@ -21,6 +21,24 @@ public class Server {
 
     private static boolean rootMode = false;
 
+    private static void login() {
+        System.out.println("[Initializing command-line interface]");
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Server Login: ");
+        String login = sc.nextLine();
+        System.out.print("Server password: ");
+        String passwd = sc.nextLine();
+
+        if (!Server.queryManager.areLoginCredentialsValid(login, passwd)) {
+            System.out.println("[Error: No such login or password]");
+            System.exit(-1);
+        } else {
+            System.out.println("[Successfully logged in]");
+            Server.username = login;
+            cmdManager.manageCommand("clear");
+        }
+    }
+
     private static void initServer() {
         try {
             Server.sessionManager = new SessionManager("localhost", 6911);
@@ -29,6 +47,7 @@ public class Server {
         }
         Server.cmdManager = new CommandManager();
         Server.queryManager = new DBQueryManager();
+        Server.login();
         try {
             Server.runServer();
         } catch (UnknownHostException e) {

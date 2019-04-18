@@ -1,8 +1,5 @@
 package command;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 // TODO:
@@ -17,7 +14,7 @@ public class Clear extends Command {
     protected void loadFlags(StringTokenizer cmdTokenizer) {
         while (cmdTokenizer.hasMoreTokens()) {
             String token = cmdTokenizer.nextToken();
-            if (token.startsWith("-")) {
+            if (token.startsWith("--")) {
                 if (token.contains("l"))
                     this.lines = Integer.parseInt(cmdTokenizer.nextToken());
             }

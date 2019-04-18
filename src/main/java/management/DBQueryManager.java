@@ -47,4 +47,9 @@ public class DBQueryManager {
             e.printStackTrace();
         }
     }
+
+    public boolean areLoginCredentialsValid(String login, String passwd) {
+        System.out.println("Make the logging thing here"); // TODO:
+        return true;
+    }
 }
