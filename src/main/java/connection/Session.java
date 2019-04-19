@@ -1,5 +1,7 @@
 package connection;
 
+import management.RequestManager;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -14,10 +16,13 @@ class Session extends Thread {
 
     private BufferedOutputStream bufferedOutputStream;
 
-    Session(ServerSocket serverSocket) throws IOException {
+    private int sessionId;
+
+    Session(ServerSocket serverSocket, int sessionId) throws IOException {
         this.socket = serverSocket.accept();
         this.bufferedInputStream = new BufferedInputStream(this.socket.getInputStream());
         this.bufferedOutputStream = new BufferedOutputStream(this.socket.getOutputStream());
+        this.sessionId = sessionId;
     }
 
     private void messageLoop() throws IOException {
@@ -28,7 +33,12 @@ class Session extends Thread {
 
             for (int i = 0; i < length; i++)
                 sb.append((char)byteArr[i]);
-            System.out.println(sb.toString());
+
+            if (!RequestManager.processRequest(sb.toString(), this.sessionId))
+                System.err.println("\r\n[Error in communication between host and the client]");
+
+            if (this.socket.isClosed())
+                return;
         }
     }
 
@@ -40,6 +50,7 @@ class Session extends Thread {
     public void run() {
         try {
             this.messageLoop();
+            this.closeConnection();
         } catch (IOException e) {
             e.printStackTrace();
         }

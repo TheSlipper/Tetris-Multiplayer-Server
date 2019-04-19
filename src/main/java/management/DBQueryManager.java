@@ -1,13 +1,11 @@
 package management;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Scanner;
 
 public class DBQueryManager {
 
-    private Connection mySQLConnection;
+    private static Connection mySQLConnection;
 
     private String dbName = "TetrisMP";
 
@@ -24,7 +22,7 @@ public class DBQueryManager {
         this.url += dbName + "?user=" + this.username + "&password=" + this.password
                 + "&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
         try {
-            this.mySQLConnection = DriverManager.getConnection(this.url);
+            DBQueryManager.mySQLConnection = DriverManager.getConnection(this.url);
         } catch (SQLException e) {
             System.err.println("[Could not connect to the MySQL server]");
             e.printStackTrace();
@@ -48,8 +46,11 @@ public class DBQueryManager {
         }
     }
 
-    public boolean areLoginCredentialsValid(String login, String passwd) {
-        System.out.println("Make the logging thing here"); // TODO:
-        return true;
+    public static boolean areLoginCredentialsValid(String login, String passwd) throws SQLException {
+        String query = "SELECT user_id FROM `TetrisMP`.`users` WHERE username=\""
+                + login + "\" AND user_password=\"" + passwd + "\"";
+        Statement myStmt = DBQueryManager.mySQLConnection.createStatement();
+        ResultSet myRs = myStmt.executeQuery(query);
+        return myRs.next();
     }
 }

@@ -17,7 +17,7 @@ public class SessionManager extends Thread {
     private void getNewSession() {
         Session session = null;
         try {
-            session = new Session(serverSocket);
+            session = new Session(serverSocket, SessionManager.sessions.size());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -25,10 +25,19 @@ public class SessionManager extends Thread {
         sessions.add(session);
     }
 
+    private static void closeSession(int sessionId) {
+        SessionManager.sessions.get(sessionId).closeConnection();
+        SessionManager.sessions.set(sessionId, null);
+    }
+
     public static void shutdownSessions() {
         // TODO: Gracefully shutdown all the sessions
         for (Session s : sessions)
             s.closeConnection();
+    }
+
+    public static void sendStringData(String data) {
+        System.out.println("[Sending this data: " + data + "]");
     }
 
     public static String[] getIPs() {
