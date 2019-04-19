@@ -22,8 +22,13 @@ class Session extends Thread {
 
     private void messageLoop() throws IOException {
         while (true) {
-            byte[] byteArr = new byte[1];
-            int sizeOfMsg = bufferedInputStream.read(byteArr);
+            byte[] byteArr = new byte[512];
+            int length = bufferedInputStream.read(byteArr);
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < length; i++)
+                sb.append((char)byteArr[i]);
+            System.out.println(sb.toString());
         }
     }
 
@@ -35,6 +40,16 @@ class Session extends Thread {
     public void run() {
         try {
             this.messageLoop();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closeConnection() {
+        this.stop();
+        try {
+            this.socket.sendUrgentData(-2); // SUDDEN_SHUTDOWN
+            socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

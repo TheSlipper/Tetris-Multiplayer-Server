@@ -51,7 +51,7 @@ public class Man extends Command {
         try {
             System.out.println(this.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(this.manCmdName + " does not have a manual page");
             return false;
         }
 

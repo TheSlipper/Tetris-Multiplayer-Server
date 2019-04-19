@@ -21,6 +21,10 @@ public class Server {
 
     private static boolean rootMode = false;
 
+    private static final String IP_ADDR = "localhost";
+
+    private static final int PORT = 6969;
+
     private static void login() {
         System.out.println("[Initializing command-line interface]");
         Scanner sc = new Scanner(System.in);
@@ -41,7 +45,7 @@ public class Server {
 
     private static void initServer() {
         try {
-            Server.sessionManager = new SessionManager("localhost", 6911);
+            Server.sessionManager = new SessionManager(Server.IP_ADDR, Server.PORT);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,7 +81,7 @@ public class Server {
                 System.out.print("root$ ");
             cmd = sc.nextLine();
             if (!cmdManager.manageCommand(cmd))
-                System.err.println("Unkown command [" + cmd + "]:");
+                System.err.println("Error occurred while executing [" + cmd + "]");
         }
     }
 

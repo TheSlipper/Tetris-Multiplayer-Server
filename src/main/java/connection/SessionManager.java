@@ -27,6 +27,8 @@ public class SessionManager extends Thread {
 
     public static void shutdownSessions() {
         // TODO: Gracefully shutdown all the sessions
+        for (Session s : sessions)
+            s.closeConnection();
     }
 
     public static String[] getIPs() {
