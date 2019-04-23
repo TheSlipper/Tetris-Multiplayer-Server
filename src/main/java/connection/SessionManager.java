@@ -36,8 +36,14 @@ public class SessionManager extends Thread {
             s.closeConnection();
     }
 
-    public static void sendStringData(String data) {
-        System.out.println("[Sending this data: " + data + "]");
+    public static void sendStringData(String data, int id) {
+        System.out.println("[Sending this data: " + data + "] TODO: Delete this (SessionManager)");
+        try {
+            SessionManager.sessions.get(id).sendStringData(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("[Message sent (SessionManager)]");
     }
 
     public static String[] getIPs() {

@@ -42,7 +42,7 @@ public class DBQueryManager {
             this.mySQLConnection = DriverManager.getConnection(this.url);
         } catch (SQLException e) {
             System.err.println("[Could not connect to the MySQL server]");
-            e.printStackTrace();
+            System.exit(-1);
         }
     }
 

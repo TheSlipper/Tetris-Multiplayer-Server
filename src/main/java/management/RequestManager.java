@@ -27,6 +27,8 @@ public class RequestManager {
             boolean execStatus = DBQueryManager.areLoginCredentialsValid(requestTokenized.nextToken(), requestTokenized.nextToken());
             if (!execStatus)
                 ResponseManager.processResponse("INCORRECT_CREDENTIALS slipper", userId);
+            else
+                ResponseManager.processResponse("CORRECT_CREDENTIALS slipper", userId);
             return execStatus;
         }
 

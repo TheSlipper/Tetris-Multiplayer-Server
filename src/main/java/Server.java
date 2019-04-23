@@ -23,7 +23,7 @@ public class Server {
 
     private static final String IP_ADDR = "localhost";
 
-    private static final int PORT = 6969;
+    private static final int PORT = 7001;
 
     private static void login() {
         System.out.println("[Initializing command-line interface]");

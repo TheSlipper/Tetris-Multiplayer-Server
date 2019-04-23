@@ -9,7 +9,8 @@ public class ResponseManager {
     private final static String[] REQUEST_CODE_ARRAY = {
             "MAINTENANCE_SHUTDOWN",
             "SUDDEN_SHUTDOWN",
-            "INCORRECT_CREDENTIALS"
+            "INCORRECT_CREDENTIALS",
+            "CORRECT_CREDENTIALS"
     };
 
     private static boolean containsCode(String code) {
@@ -26,7 +27,9 @@ public class ResponseManager {
         } else if (code.equals(REQUEST_CODE_ARRAY[1])) { // Sudden shutdown
             System.out.println("[Sudden shutdown response not implemented yet]");
         } else if (code.equals(REQUEST_CODE_ARRAY[2])) { // Incorrect credentials
-            SessionManager.sendStringData(code + responseTokenizer.nextToken());
+            SessionManager.sendStringData(REQUEST_CODE_ARRAY[2] + " " + responseTokenizer.nextToken(), userId);
+        } else if (code.equals(REQUEST_CODE_ARRAY[3])) { // Correct credentials
+            SessionManager.sendStringData(REQUEST_CODE_ARRAY[3] + " " + responseTokenizer.nextToken(), userId);
         }
 
         return true;

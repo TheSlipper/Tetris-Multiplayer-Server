@@ -44,6 +44,7 @@ class Session extends Thread {
 
     String getIp() {
         return socket.getInetAddress().getAddress().toString();
+//                return new String(socket.getInetAddress().getAddress());
     }
 
     @Override
@@ -64,5 +65,10 @@ class Session extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void sendStringData(String data) throws IOException {
+        byte[] bytes = data.getBytes();
+        bufferedOutputStream.write(bytes);
     }
 }

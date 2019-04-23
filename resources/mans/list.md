@@ -6,7 +6,7 @@
 
 **SYNOPSIS**
        `list`
-       `list -l 40`
+       `list -ci`
 
 **DESCRIPTION**
        `list` - clears your screen if this is possible.
