@@ -2,7 +2,6 @@ package command;
 
 import java.util.StringTokenizer;
 
-// TODO:
 public class Clear extends Command {
 
     int lines = 40;

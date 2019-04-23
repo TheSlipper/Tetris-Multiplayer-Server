@@ -1,6 +1,7 @@
 package management;
 
-import java.net.Socket;
+import connection.SessionManager;
+
 import java.sql.SQLException;
 import java.util.StringTokenizer;
 
@@ -23,13 +24,16 @@ public class RequestManager {
     }
 
     private static boolean redirectRequest(String code, StringTokenizer requestTokenized, int userId) throws SQLException {
-        if (code.equals(REQUEST_CODE_ARRAY[0])) { // equals LOGIN
-            boolean execStatus = DBQueryManager.areLoginCredentialsValid(requestTokenized.nextToken(), requestTokenized.nextToken());
+        if (code.equals(REQUEST_CODE_ARRAY[0])) { // log in
+            String login = requestTokenized.nextToken();
+            boolean execStatus = DBQueryManager.areLoginCredentialsValid(login, requestTokenized.nextToken());
             if (!execStatus)
-                ResponseManager.processResponse("INCORRECT_CREDENTIALS slipper", userId); // TODO: Change Slipper
-            else                                                                                       // to actual nickname
-                ResponseManager.processResponse("CORRECT_CREDENTIALS slipper", userId);
+                ResponseManager.processResponse("INCORRECT_CREDENTIALS " + login, userId);
+            else
+                ResponseManager.processResponse("CORRECT_CREDENTIALS " + login, userId);
             return execStatus;
+        } else if (code.equals(REQUEST_CODE_ARRAY[1])) { // log out
+            SessionManager.shutdownSession(userId);
         }
 
         return false;

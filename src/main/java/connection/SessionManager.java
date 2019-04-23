@@ -14,20 +14,19 @@ public class SessionManager extends Thread {
         this.serverSocket = new ServerSocket(port);
     }
 
-    private void getNewSession() {
+    private Session getNewSession() {
         Session session = null;
         try {
             session = new Session(serverSocket, SessionManager.sessions.size());
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        sessions.add(session);
+        return session;
     }
 
-    private static void closeSession(int sessionId) {
+    public static void shutdownSession(int sessionId) {
         SessionManager.sessions.get(sessionId).closeConnection();
-        SessionManager.sessions.set(sessionId, null);
+        SessionManager.sessions.set(sessionId, new Session());
     }
 
     public static void shutdownSessions() {
@@ -37,13 +36,11 @@ public class SessionManager extends Thread {
     }
 
     public static void sendStringData(String data, int id) {
-        System.out.println("[Sending this data: " + data + "] TODO: Delete this (SessionManager)");
         try {
             SessionManager.sessions.get(id).sendStringData(data);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("[Message sent (SessionManager)]");
     }
 
     public static String[] getIPs() {
@@ -55,9 +52,18 @@ public class SessionManager extends Thread {
 
     @Override
     public void run() {
-        while (true) {
-            this.getNewSession();
-            sessions.get(sessions.size()-1).start();
+        for (int i = 0; i <= SessionManager.sessions.size(); i++) {
+            if (i == SessionManager.sessions.size()) {
+                SessionManager.sessions.add(this.getNewSession());
+                SessionManager.sessions.get(i).start();
+            } else if (!SessionManager.sessions.get(i).isConnected()) {
+                try {
+                    SessionManager.sessions.get(i).connect(serverSocket, i);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                SessionManager.sessions.get(i).start();
+            }
         }
     }
 }

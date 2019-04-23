@@ -8,25 +8,20 @@ import java.net.Socket;
 
 class Session extends Thread {
 
-    private Socket socket;
-
-    private OutputStream outputStream;
+    private Socket socket = new Socket();
 
     private BufferedInputStream bufferedInputStream;
 
     private BufferedOutputStream bufferedOutputStream;
 
-    private PrintWriter printWriter;
-
     private int sessionId;
 
+    private boolean connected = false;
+
+    Session() {}
+
     Session(ServerSocket serverSocket, int sessionId) throws IOException {
-        this.socket = serverSocket.accept();
-        this.bufferedInputStream = new BufferedInputStream(this.socket.getInputStream());
-        this.outputStream = this.socket.getOutputStream();
-        this.bufferedOutputStream = new BufferedOutputStream(outputStream);
-        this.printWriter = new PrintWriter(this.outputStream);
-        this.sessionId = sessionId;
+        this.connect(serverSocket, sessionId);
     }
 
     private void messageLoop() throws IOException {
@@ -47,7 +42,10 @@ class Session extends Thread {
     }
 
     String getIp() {
-        return socket.getInetAddress().getAddress().toString();
+        if (this.connected)
+            return socket.getInetAddress().getAddress().toString();
+        else
+            return "[EMPTY SESSION]";
 //                return new String(socket.getInetAddress().getAddress());
     }
 
@@ -64,7 +62,6 @@ class Session extends Thread {
     public void closeConnection() {
         this.stop();
         try {
-            this.socket.sendUrgentData(-2); // SUDDEN_SHUTDOWN
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -74,5 +71,17 @@ class Session extends Thread {
     public void sendStringData(String data) throws IOException {
         bufferedOutputStream.write(data.getBytes(), 0, data.length());
         bufferedOutputStream.flush();
+    }
+
+    public boolean isConnected() {
+        return this.socket.isConnected();
+    }
+
+    public void connect(ServerSocket serverSocket, int sessionId) throws IOException {
+        this.socket = serverSocket.accept();
+        this.bufferedInputStream = new BufferedInputStream(this.socket.getInputStream());
+        this.bufferedOutputStream = new BufferedOutputStream(this.socket.getOutputStream());
+        this.sessionId = sessionId;
+        this.connected = true;
     }
 }

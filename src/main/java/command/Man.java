@@ -1,12 +1,10 @@
 package command;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
-// TODO:
 public class Man extends Command {
 
     private final String manPath = "resources/mans/";
