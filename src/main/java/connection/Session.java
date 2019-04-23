@@ -2,9 +2,7 @@ package connection;
 
 import management.RequestManager;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -12,16 +10,22 @@ class Session extends Thread {
 
     private Socket socket;
 
+    private OutputStream outputStream;
+
     private BufferedInputStream bufferedInputStream;
 
     private BufferedOutputStream bufferedOutputStream;
+
+    private PrintWriter printWriter;
 
     private int sessionId;
 
     Session(ServerSocket serverSocket, int sessionId) throws IOException {
         this.socket = serverSocket.accept();
         this.bufferedInputStream = new BufferedInputStream(this.socket.getInputStream());
-        this.bufferedOutputStream = new BufferedOutputStream(this.socket.getOutputStream());
+        this.outputStream = this.socket.getOutputStream();
+        this.bufferedOutputStream = new BufferedOutputStream(outputStream);
+        this.printWriter = new PrintWriter(this.outputStream);
         this.sessionId = sessionId;
     }
 
@@ -68,7 +72,7 @@ class Session extends Thread {
     }
 
     public void sendStringData(String data) throws IOException {
-        byte[] bytes = data.getBytes();
-        bufferedOutputStream.write(bytes);
+        bufferedOutputStream.write(data.getBytes(), 0, data.length());
+        bufferedOutputStream.flush();
     }
 }

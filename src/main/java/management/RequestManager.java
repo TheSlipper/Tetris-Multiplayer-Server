@@ -26,8 +26,8 @@ public class RequestManager {
         if (code.equals(REQUEST_CODE_ARRAY[0])) { // equals LOGIN
             boolean execStatus = DBQueryManager.areLoginCredentialsValid(requestTokenized.nextToken(), requestTokenized.nextToken());
             if (!execStatus)
-                ResponseManager.processResponse("INCORRECT_CREDENTIALS slipper", userId);
-            else
+                ResponseManager.processResponse("INCORRECT_CREDENTIALS slipper", userId); // TODO: Change Slipper
+            else                                                                                       // to actual nickname
                 ResponseManager.processResponse("CORRECT_CREDENTIALS slipper", userId);
             return execStatus;
         }
