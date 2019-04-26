@@ -33,10 +33,10 @@ class Session extends Thread {
             for (int i = 0; i < length; i++)
                 sb.append((char)byteArr[i]);
 
-            if (!RequestManager.processRequest(sb.toString(), this.sessionId))
+            if (!sb.toString().equals("") && !RequestManager.processRequest(sb.toString(), this.sessionId))
                 System.err.println("\r\n[Error in communication between host and the client]");
 
-            if (this.socket.isClosed())
+            if (!this.connected)
                 return;
         }
     }
@@ -45,8 +45,7 @@ class Session extends Thread {
         if (this.connected)
             return socket.getInetAddress().getAddress().toString();
         else
-            return "[EMPTY SESSION]";
-//                return new String(socket.getInetAddress().getAddress());
+            return "[Not connected]";
     }
 
     @Override
@@ -60,9 +59,9 @@ class Session extends Thread {
     }
 
     public void closeConnection() {
-        this.stop();
         try {
-            socket.close();
+            this.socket.shutdownInput();
+            this.socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

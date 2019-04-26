@@ -34,12 +34,16 @@ public class RequestManager {
             return execStatus;
         } else if (code.equals(REQUEST_CODE_ARRAY[1])) { // log out
             SessionManager.shutdownSession(userId);
+            return true;
         }
 
         return false;
     }
 
     public static boolean processRequest(String requestData, int sessionId) {
+
+        System.out.println("Request data: " + requestData);
+
         StringTokenizer requestTokenized = new StringTokenizer(requestData);
         String code = requestTokenized.nextToken();
 
