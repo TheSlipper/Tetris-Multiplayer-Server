@@ -41,9 +41,6 @@ public class RequestManager {
     }
 
     public static boolean processRequest(String requestData, int sessionId) {
-
-        System.out.println("Request data: " + requestData);
-
         StringTokenizer requestTokenized = new StringTokenizer(requestData);
         String code = requestTokenized.nextToken();
 
