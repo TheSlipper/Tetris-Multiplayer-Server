@@ -52,13 +52,34 @@ public class SessionManager extends Thread {
 
     @Override
     public void run() {
+
+//        while (true) {
+//            for (int i = 0; i <= SessionManager.sessions.size(); i++) {
+//                if (i == SessionManager.sessions.size()) {
+//                    SessionManager.sessions.add(this.getNewSession());
+//                    SessionManager.sessions.get(i).start();
+//                    break;
+//                } else if (!SessionManager.sessions.get(i).isConnected()) {
+//                    try {
+//                        SessionManager.sessions.get(i).connect(serverSocket, i);
+//                        break;
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                    SessionManager.sessions.get(i).start();
+//                }
+//            }
+//        }
+
         for (int i = 0; i <= SessionManager.sessions.size(); i++) {
             if (i == SessionManager.sessions.size()) {
                 SessionManager.sessions.add(this.getNewSession());
                 SessionManager.sessions.get(i).start();
+                i = -1;
             } else if (!SessionManager.sessions.get(i).isConnected()) {
                 try {
                     SessionManager.sessions.get(i).connect(serverSocket, i);
+                    i = -1;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
