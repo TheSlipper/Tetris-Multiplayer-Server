@@ -29,10 +29,17 @@ public class SessionManager extends Thread {
         SessionManager.sessions.set(sessionId, new Session());
     }
 
+    public static void suddenShutdownSession(int sessionId) {
+        Session s = SessionManager.sessions.get(sessionId);
+        SessionManager.sendStringData("SUDDEN_SHUTDOWN", s.getSessionId());
+        s.closeConnection();
+    }
+
     public static void shutdownSessions() {
-        // TODO: Gracefully shutdown all the sessions
-        for (Session s : sessions)
+        for (Session s : sessions) {
+            SessionManager.sendStringData("SUDDEN_SHUTDOWN", s.getSessionId());
             s.closeConnection();
+        }
     }
 
     public static void sendStringData(String data, int id) {
@@ -52,25 +59,6 @@ public class SessionManager extends Thread {
 
     @Override
     public void run() {
-
-//        while (true) {
-//            for (int i = 0; i <= SessionManager.sessions.size(); i++) {
-//                if (i == SessionManager.sessions.size()) {
-//                    SessionManager.sessions.add(this.getNewSession());
-//                    SessionManager.sessions.get(i).start();
-//                    break;
-//                } else if (!SessionManager.sessions.get(i).isConnected()) {
-//                    try {
-//                        SessionManager.sessions.get(i).connect(serverSocket, i);
-//                        break;
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                    SessionManager.sessions.get(i).start();
-//                }
-//            }
-//        }
-
         for (int i = 0; i <= SessionManager.sessions.size(); i++) {
             if (i == SessionManager.sessions.size()) {
                 SessionManager.sessions.add(this.getNewSession());

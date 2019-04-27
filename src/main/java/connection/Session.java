@@ -83,4 +83,8 @@ class Session extends Thread {
         this.sessionId = sessionId;
         this.connected = true;
     }
+
+    public int getSessionId() {
+        return this.sessionId;
+    }
 }
