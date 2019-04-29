@@ -37,7 +37,8 @@ public class SessionManager extends Thread {
 
     public static void shutdownSessions() {
         for (Session s : sessions) {
-            SessionManager.sendStringData("SUDDEN_SHUTDOWN", s.getSessionId());
+            if (s.isConnected())
+                SessionManager.sendStringData("SUDDEN_SHUTDOWN", s.getSessionId());
             s.closeConnection();
         }
     }
@@ -67,11 +68,11 @@ public class SessionManager extends Thread {
             } else if (!SessionManager.sessions.get(i).isConnected()) {
                 try {
                     SessionManager.sessions.get(i).connect(serverSocket, i);
+                    SessionManager.sessions.get(i).start();
                     i = -1;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                SessionManager.sessions.get(i).start();
             }
         }
     }

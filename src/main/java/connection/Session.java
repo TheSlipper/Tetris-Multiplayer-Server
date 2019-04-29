@@ -60,8 +60,11 @@ class Session extends Thread {
 
     public void closeConnection() {
         try {
-            this.socket.shutdownInput();
-            this.socket.close();
+            if (this.socket.isConnected())
+            {
+                this.socket.shutdownInput();
+                this.socket.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
