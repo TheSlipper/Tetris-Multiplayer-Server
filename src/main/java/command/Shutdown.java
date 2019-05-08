@@ -1,6 +1,6 @@
 package command;
 
-import connection.SessionManager;
+import management.SessionManager;
 
 import java.util.StringTokenizer;
 

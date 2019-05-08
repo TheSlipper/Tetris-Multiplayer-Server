@@ -29,6 +29,7 @@ public class MatchManager extends Thread {
                 if (task.isScheduledForNow() && !task.isBeingAccessed()) {
                     task.setAccessed(true);
                     this.handleTask(task.getTaskId(), task.getTaskName(), task.getTaskContent());
+                    break;
                 }
             }
         }

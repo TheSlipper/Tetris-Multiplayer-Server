@@ -1,4 +1,4 @@
-import connection.SessionManager;
+import management.SessionManager;
 import management.DBQueryManager;
 import management.CommandManager;
 import management.MatchManager;

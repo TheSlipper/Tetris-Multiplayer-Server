@@ -1,7 +1,5 @@
 package management;
 
-import connection.SessionManager;
-
 import java.sql.SQLException;
 import java.util.StringTokenizer;
 

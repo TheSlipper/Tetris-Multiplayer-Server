@@ -1,7 +1,5 @@
 package management;
 
-import connection.SessionManager;
-
 import java.util.StringTokenizer;
 
 public class ResponseManager {

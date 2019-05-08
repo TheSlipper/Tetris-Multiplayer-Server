@@ -6,7 +6,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-class Session extends Thread {
+public class Session extends Thread {
 
     private Socket socket = new Socket();
 
@@ -22,9 +22,9 @@ class Session extends Thread {
 
     private boolean inQueue = false;
 
-    Session() {}
+    public Session() {}
 
-    Session(ServerSocket serverSocket, int sessionId) throws IOException {
+    public Session(ServerSocket serverSocket, int sessionId) throws IOException {
         this.connect(serverSocket, sessionId);
     }
 

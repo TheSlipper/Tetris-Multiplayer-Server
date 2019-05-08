@@ -1,4 +1,6 @@
-package connection;
+package management;
+
+import connection.Session;
 
 import java.io.IOException;
 import java.net.ServerSocket;
