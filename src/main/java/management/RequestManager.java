@@ -23,17 +23,21 @@ public class RequestManager {
         return false;
     }
 
-    private static boolean redirectRequest(String code, StringTokenizer requestTokenized, int userId) throws SQLException {
+    private static boolean redirectRequest(String code, StringTokenizer requestTokenized, int sessionId) throws SQLException {
         if (code.equals(REQUEST_CODE_ARRAY[0])) { // log in
             String login = requestTokenized.nextToken();
             boolean execStatus = DBQueryManager.areLoginCredentialsValid(login, requestTokenized.nextToken());
             if (!execStatus)
-                ResponseManager.processResponse("INCORRECT_CREDENTIALS " + login, userId);
+                ResponseManager.processResponse("INCORRECT_CREDENTIALS " + login, sessionId);
             else
-                ResponseManager.processResponse("CORRECT_CREDENTIALS " + login, userId);
+                ResponseManager.processResponse("CORRECT_CREDENTIALS " + login, sessionId);
             return execStatus;
         } else if (code.equals(REQUEST_CODE_ARRAY[1])) { // log out
-            SessionManager.shutdownSession(userId);
+            SessionManager.shutdownSession(sessionId);
+            return true;
+        } else if (code.equals(REQUEST_CODE_ARRAY[2])) { // game search
+            MatchManager.addMatchTask("GAME_SETUP", Integer.toString(sessionId),
+                    System.currentTimeMillis() / 1000);
             return true;
         }
 

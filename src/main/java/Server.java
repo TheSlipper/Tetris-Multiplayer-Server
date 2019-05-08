@@ -1,6 +1,7 @@
 import connection.SessionManager;
 import management.DBQueryManager;
 import management.CommandManager;
+import management.MatchManager;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -16,6 +17,8 @@ public class Server {
     private static DBQueryManager queryManager;
 
     private static CommandManager cmdManager;
+
+    private static MatchManager matchManager;
 
     private static String username = "slipper"; // TODO: Load from database
 
@@ -51,6 +54,7 @@ public class Server {
         }
         Server.cmdManager = new CommandManager();
         Server.queryManager = new DBQueryManager();
+        Server.matchManager = new MatchManager();
         Server.login();
         try {
             Server.runServer();
@@ -61,6 +65,7 @@ public class Server {
 
     private static void runServer() throws UnknownHostException {
         Server.sessionManager.start();
+        Server.matchManager.start();
 
         System.out.println("[Tetris Multiplayer Server - Pre-Alpha Build]");
         System.out.println("[Host info: " + InetAddress.getLocalHost() + "]");

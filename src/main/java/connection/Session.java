@@ -18,6 +18,10 @@ class Session extends Thread {
 
     private boolean connected = false;
 
+    private boolean playing = false;
+
+    private boolean inQueue = false;
+
     Session() {}
 
     Session(ServerSocket serverSocket, int sessionId) throws IOException {
@@ -41,7 +45,7 @@ class Session extends Thread {
         }
     }
 
-    String getIp() {
+    public String getIp() {
         if (this.connected)
             return socket.getInetAddress().getAddress().toString();
         else
@@ -89,5 +93,13 @@ class Session extends Thread {
 
     public int getSessionId() {
         return this.sessionId;
+    }
+
+    public void setInQueue(boolean queue) {
+        this.inQueue = queue;
+    }
+
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
     }
 }

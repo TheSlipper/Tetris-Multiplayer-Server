@@ -10,7 +10,8 @@ public class ResponseManager {
             "MAINTENANCE_SHUTDOWN",
             "SUDDEN_SHUTDOWN",
             "INCORRECT_CREDENTIALS",
-            "CORRECT_CREDENTIALS"
+            "CORRECT_CREDENTIALS",
+            "GAME_SETUP"
     };
 
     private static boolean containsCode(String code) {
@@ -21,15 +22,18 @@ public class ResponseManager {
         return false;
     }
 
-    private static boolean redirectResponse(String code, StringTokenizer responseTokenizer, int userId) {
+    private static boolean redirectResponse(String code, StringTokenizer responseTokenizer, int sessionId) {
         if (code.equals(REQUEST_CODE_ARRAY[0])) { // Maintenance shutdown
             System.out.println("[Maintenance shutdown response not implemented yet]");
         } else if (code.equals(REQUEST_CODE_ARRAY[1])) { // Sudden shutdown
             System.out.println("[Sudden shutdown response not implemented yet]");
         } else if (code.equals(REQUEST_CODE_ARRAY[2])) { // Incorrect credentials
-            SessionManager.sendStringData(REQUEST_CODE_ARRAY[2] + " " + responseTokenizer.nextToken(), userId);
+            SessionManager.sendStringData(REQUEST_CODE_ARRAY[2] + " " + responseTokenizer.nextToken(), sessionId);
         } else if (code.equals(REQUEST_CODE_ARRAY[3])) { // Correct credentials
-            SessionManager.sendStringData(REQUEST_CODE_ARRAY[3] + " " + responseTokenizer.nextToken(), userId);
+            SessionManager.sendStringData(REQUEST_CODE_ARRAY[3] + " " + responseTokenizer.nextToken(), sessionId);
+        } else if (code.equals(REQUEST_CODE_ARRAY[4])) { // Game set up
+            // TODO: Put the opponent data in here
+            SessionManager.sendStringData(REQUEST_CODE_ARRAY[4] + " ", sessionId);
         }
 
         return true;
