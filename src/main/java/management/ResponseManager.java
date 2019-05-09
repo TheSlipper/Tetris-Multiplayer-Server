@@ -9,7 +9,8 @@ public class ResponseManager {
             "SUDDEN_SHUTDOWN",
             "INCORRECT_CREDENTIALS",
             "CORRECT_CREDENTIALS",
-            "GAME_SETUP"
+            "GAME_SETUP",
+            "SEND_USER_DATA"
     };
 
     private static boolean containsCode(String code) {
@@ -32,6 +33,8 @@ public class ResponseManager {
         } else if (code.equals(REQUEST_CODE_ARRAY[4])) { // Game set up
             // TODO: Put the opponent data in here
             SessionManager.sendStringData(REQUEST_CODE_ARRAY[4] + " ", sessionId);
+        } else if (code.equals(REQUEST_CODE_ARRAY[5])) { // Send User Data
+            SessionManager.sendStringData(code + responseTokenizer.nextToken(""), sessionId);
         }
 
         return true;

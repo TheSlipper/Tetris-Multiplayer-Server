@@ -1,5 +1,6 @@
 package management;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.StringTokenizer;
 
@@ -8,7 +9,7 @@ public class RequestManager {
     private final static String[] REQUEST_CODE_ARRAY = {
             "LOGIN",
             "LOGOUT",
-            "USER_DATA",
+            "GET_USER_DATA",
             "GAME_SEARCH",
             "CANCEL_SEARCH",
             "ABORT_GAME"
@@ -36,7 +37,18 @@ public class RequestManager {
             return true;
         } else if (code.equals(REQUEST_CODE_ARRAY[2])) { // User Data
             String username = requestTokenized.nextToken();
-
+            ResultSet rs = DBQueryManager.runSQLQuerry("SELECT user_id FROM `TetrisMP`.`users` WHERE "
+                    + "username=\"" + username + "\"");
+            rs.next();
+            String id = rs.getString("user_id");
+            rs = DBQueryManager.runSQLQuerry("SELECT * FROM `TetrisMP`.`user_game_data` WHERE "
+                    + "user_id=" + id);
+            rs.next();
+            ResponseManager.processResponse("SEND_USER_DATA " + rs.getString("elo")
+                + " " + rs.getString("privilege_group") + " " + rs.getString("unranked_wins")
+                + " " + rs.getString("unranked_losses") + " " + rs.getString("ranked_wins")
+                + " " + rs.getString("ranked_losses") + " " + rs.getString("tetromino_points")
+                + " " + rs.getString("time_played"), sessionId);
         } else if (code.equals(REQUEST_CODE_ARRAY[3])) { // game search
             MatchManager.addMatchTask("GAME_SETUP", Integer.toString(sessionId),
                     System.currentTimeMillis() / 1000);

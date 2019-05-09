@@ -75,6 +75,7 @@ public class Session extends Thread {
     }
 
     public void sendStringData(String data) throws IOException {
+
         bufferedOutputStream.write(data.getBytes(), 0, data.length());
         bufferedOutputStream.flush();
     }
