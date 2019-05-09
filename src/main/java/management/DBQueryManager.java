@@ -46,11 +46,15 @@ public class DBQueryManager {
         }
     }
 
+    public static ResultSet runSQLQuerry(String sqlQuery) throws SQLException {
+        Statement myStmt = DBQueryManager.mySQLConnection.createStatement();
+        return  myStmt.executeQuery(sqlQuery);
+    }
+
     public static boolean areLoginCredentialsValid(String login, String passwd) throws SQLException {
         String query = "SELECT user_id FROM `TetrisMP`.`users` WHERE username=\""
                 + login + "\" AND user_password=\"" + passwd + "\"";
-        Statement myStmt = DBQueryManager.mySQLConnection.createStatement();
-        ResultSet myRs = myStmt.executeQuery(query);
+        ResultSet myRs = DBQueryManager.runSQLQuerry(query);
         return myRs.next();
     }
 }

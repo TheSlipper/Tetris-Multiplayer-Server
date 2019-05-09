@@ -8,6 +8,7 @@ public class RequestManager {
     private final static String[] REQUEST_CODE_ARRAY = {
             "LOGIN",
             "LOGOUT",
+            "USER_DATA",
             "GAME_SEARCH",
             "CANCEL_SEARCH",
             "ABORT_GAME"
@@ -33,7 +34,10 @@ public class RequestManager {
         } else if (code.equals(REQUEST_CODE_ARRAY[1])) { // log out
             SessionManager.shutdownSession(sessionId);
             return true;
-        } else if (code.equals(REQUEST_CODE_ARRAY[2])) { // game search
+        } else if (code.equals(REQUEST_CODE_ARRAY[2])) { // User Data
+            String username = requestTokenized.nextToken();
+
+        } else if (code.equals(REQUEST_CODE_ARRAY[3])) { // game search
             MatchManager.addMatchTask("GAME_SETUP", Integer.toString(sessionId),
                     System.currentTimeMillis() / 1000);
             return true;
