@@ -12,7 +12,8 @@ public class RequestManager {
             "GET_USER_DATA",
             "GAME_SEARCH",
             "CANCEL_SEARCH",
-            "ABORT_GAME"
+            "ABORT_GAME",
+            "GET_UPDATE_LOGS"
     };
 
     private static boolean containsCode(String code) {
@@ -44,7 +45,7 @@ public class RequestManager {
             rs = DBQueryManager.runSQLQuerry("SELECT * FROM `TetrisMP`.`user_game_data` WHERE "
                     + "user_id=" + id);
             rs.next();
-            ResponseManager.processResponse("SEND_USER_DATA " + rs.getString("elo")
+            return ResponseManager.processResponse("SEND_USER_DATA " + rs.getString("elo")
                 + " " + rs.getString("privilege_group") + " " + rs.getString("unranked_wins")
                 + " " + rs.getString("unranked_losses") + " " + rs.getString("ranked_wins")
                 + " " + rs.getString("ranked_losses") + " " + rs.getString("tetromino_points")
@@ -53,9 +54,29 @@ public class RequestManager {
             MatchManager.addMatchTask("GAME_SETUP", Integer.toString(sessionId),
                     System.currentTimeMillis() / 1000);
             return true;
-        }
+        } else if (code.equals(REQUEST_CODE_ARRAY[4])) { // Cancel Search
+            return false;
+        } else if (code.equals(REQUEST_CODE_ARRAY[5])) { // Abort Game
+            return false;
+        } else if (code.equals(REQUEST_CODE_ARRAY[6])) { // Get Update Logs
+            StringBuilder sb = new StringBuilder();
+            ResultSet news = DBQueryManager.runSQLQuerry("SELECT * FROM `TetrisMP`.`update_logs` ORDER BY "
+                    + "update_log_date LIMIT 5");
+            while (news.next()) {
+                ResultSet author = DBQueryManager.runSQLQuerry("SELECT username FROM `TetrisMP`.`users` WHERE user_id="
+                        + news.getString("update_log_author"));
+                author.next();
+                String authorName = author.getString("username");
 
-        return false;
+                sb.append(news.getString("update_log_header") + "\r\n");
+                sb.append(news.getString("update_log_content") + "\r\n");
+                sb.append(authorName + "\r\n");
+                sb.append(news.getString("update_log_date") + "\r\n");
+            }
+            return ResponseManager.processResponse("SEND_UPDATE_LOGS\r\n" + sb.toString(), sessionId);
+        } else {
+            return false;
+        }
     }
 
     public static boolean processRequest(String requestData, int sessionId) {
