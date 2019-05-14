@@ -60,6 +60,14 @@ public class SessionManager extends Thread {
         return ipArr;
     }
 
+    public static void assignDbId(int sessionId, int dbId) {
+        SessionManager.sessions.get(sessionId).setDbUsernameId(dbId);
+    }
+
+    public static Session getSession(int sessionId) {
+        return SessionManager.sessions.get(sessionId);
+    }
+
     @Override
     public void run() {
         for (int i = 0; i <= SessionManager.sessions.size(); i++) {

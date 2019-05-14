@@ -16,6 +16,8 @@ public class Session extends Thread {
 
     private int sessionId;
 
+    private int dbUsernameId;
+
     private boolean connected = false;
 
     private boolean playing = false;
@@ -101,5 +103,13 @@ public class Session extends Thread {
 
     public void setPlaying(boolean playing) {
         this.playing = playing;
+    }
+
+    public void setDbUsernameId(int id) {
+        this.dbUsernameId = id;
+    }
+
+    public int getDbUserNameId() {
+        return this.dbUsernameId;
     }
 }

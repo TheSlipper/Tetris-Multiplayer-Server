@@ -1,5 +1,7 @@
 package management;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.StringTokenizer;
 
 public class ResponseManager {
@@ -22,7 +24,7 @@ public class ResponseManager {
         return false;
     }
 
-    private static boolean redirectResponse(String code, StringTokenizer responseTokenizer, int sessionId) {
+    private static boolean redirectResponse(String code, StringTokenizer responseTokenizer, int sessionId) throws SQLException {
         if (code.equals(REQUEST_CODE_ARRAY[0])) { // Maintenance shutdown
             System.out.println("[Maintenance shutdown response not implemented yet]");
         } else if (code.equals(REQUEST_CODE_ARRAY[1])) { // Sudden shutdown
@@ -30,7 +32,12 @@ public class ResponseManager {
         } else if (code.equals(REQUEST_CODE_ARRAY[2])) { // Incorrect credentials
             SessionManager.sendStringData(REQUEST_CODE_ARRAY[2] + " " + responseTokenizer.nextToken(), sessionId);
         } else if (code.equals(REQUEST_CODE_ARRAY[3])) { // Correct credentials
-            SessionManager.sendStringData(REQUEST_CODE_ARRAY[3] + " " + responseTokenizer.nextToken(), sessionId);
+            String username = responseTokenizer.nextToken();
+            ResultSet rs = DBQueryManager.runSQLQuerry("SELECT user_id FROM `TetrisMP`.`users` WHERE username=\""
+                            + username + "\"");
+            rs.next();
+            SessionManager.assignDbId(sessionId, rs.getInt("user_id"));
+            SessionManager.sendStringData(REQUEST_CODE_ARRAY[3] + " " + username, sessionId);
         } else if (code.equals(REQUEST_CODE_ARRAY[4])) { // Game set up
             // TODO: Put the opponent data in here
             SessionManager.sendStringData(REQUEST_CODE_ARRAY[4] + " ", sessionId);
@@ -51,7 +58,12 @@ public class ResponseManager {
         if (!ResponseManager.containsCode(code))
             return false;
 
-        return ResponseManager.redirectResponse(code, responseTokenizer, sessionId);
+        try {
+            return ResponseManager.redirectResponse(code, responseTokenizer, sessionId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 }

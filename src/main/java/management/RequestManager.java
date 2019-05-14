@@ -51,8 +51,11 @@ public class RequestManager {
                 + " " + rs.getString("ranked_losses") + " " + rs.getString("tetromino_points")
                 + " " + rs.getString("time_played"), sessionId);
         } else if (code.equals(REQUEST_CODE_ARRAY[3])) { // game search
-            MatchManager.addMatchTask("GAME_SETUP", Integer.toString(sessionId),
-                    System.currentTimeMillis() / 1000);
+            ResultSet rs = DBQueryManager.runSQLQuerry("SELECT elo FROM `TetrisMP`.`user_game_data`"
+                            + " WHERE user_id=" + SessionManager.getSession(sessionId).getDbUserNameId());
+            rs.next();
+            MatchManager.addMatchTask("GAME_SETUP", Integer.toString(sessionId) + " "
+                            + rs.getString("elo"), System.currentTimeMillis() / 1000);
             return true;
         } else if (code.equals(REQUEST_CODE_ARRAY[4])) { // Cancel Search
             return false;
