@@ -3,6 +3,8 @@ package management;
 import connection.Match;
 import connection.MatchTask;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +41,42 @@ public class MatchManager extends Thread {
         }
     }
 
+    private void setUpMatch(int sessionId, int opponentSessionId) throws SQLException {
+        StringBuilder sb1 = new StringBuilder(), sb2 = new StringBuilder();
+        ResultSet rs1, rs2;
+        String opponentDBSessionId = Integer.toString(SessionManager.getSession(opponentSessionId).getDbUserNameId());
+        String sessionDBId = Integer.toString(SessionManager.getSession(sessionId).getDbUserNameId());
+        rs1 = DBQueryManager.runSQLQuerry("SELECT * FROM `TetrisMP`.`users`, `TetrisMP`.`user_game_data`" +
+            " WHERE user_game_data.user_id=" + sessionDBId + " AND " + "users.user_id=" + sessionDBId);
+        rs2 = DBQueryManager.runSQLQuerry("SELECT * FROM `TetrisMP`.`users`, `TetrisMP`.`user_game_data`" +
+                " WHERE user_game_data.user_id=" + opponentDBSessionId + " AND " + "users.user_id=" + opponentDBSessionId);
+        rs1.next();
+        rs2.next();
+        sb1.append("GAME_SETUP ");
+        sb2.append("GAME_SETUP ");
+        sb1.append(rs1.getString("elo") + " ");
+        sb2.append(rs2.getString("elo") + " ");
+        sb1.append(rs1.getString("privilege_group") + " ");
+        sb2.append(rs2.getString("privilege_group") + " ");
+        sb1.append(rs1.getString("unranked_wins") + " ");
+        sb2.append(rs2.getString("unranked_wins") + " ");
+        sb1.append(rs1.getString("unranked_losses") + " ");
+        sb2.append(rs2.getString("unranked_losses") + " ");
+        sb1.append(rs1.getString("ranked_wins") + " ");
+        sb2.append(rs2.getString("ranked_wins") + " ");
+        sb1.append(rs1.getString("ranked_losses") + " ");
+        sb2.append(rs2.getString("ranked_losses") + " ");
+        sb1.append(rs1.getString("tetromino_points") + " ");
+        sb2.append(rs2.getString("tetromino_points") + " ");
+        sb1.append(rs1.getString("time_played") + " ");
+        sb2.append(rs2.getString("time_played") + " ");
+        sb1.append(rs1.getString("username") + " ");
+        sb2.append(rs2.getString("username") + " ");
+
+        ResponseManager.processResponse(sb2.toString(), sessionId);
+        ResponseManager.processResponse(sb1.toString(), opponentSessionId);
+    }
+
     private void handleTask(int taskId, String taskName, String taskContent) {
         if (taskName.equals(MatchManager.matchTaskNames[0])) { // Game Setup
             int sessionId = MatchManager.matchTasks.get(taskId).getConcernedUserId();
@@ -53,9 +91,11 @@ public class MatchManager extends Thread {
                     opponentElo = person.getValue();
                     break;
                 }
-                ResponseManager.processResponse("GAME_SETUP " + opponentSessionId + " " +
-                        opponentElo, sessionId);
-                ResponseManager.processResponse("GAME_SETUP " + sessionId + " " + elo, opponentSessionId);
+                try {
+                    this.setUpMatch(sessionId, opponentSessionId);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         } else if (taskName.equals(MatchManager.matchTaskNames[1])) { // Send opponent data
 

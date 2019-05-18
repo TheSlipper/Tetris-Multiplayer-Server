@@ -39,8 +39,7 @@ public class ResponseManager {
             SessionManager.assignDbId(sessionId, rs.getInt("user_id"));
             SessionManager.sendStringData(REQUEST_CODE_ARRAY[3] + " " + username, sessionId);
         } else if (code.equals(REQUEST_CODE_ARRAY[4])) { // Game set up
-            // TODO: Put the opponent data in here
-            SessionManager.sendStringData(REQUEST_CODE_ARRAY[4] + " ", sessionId);
+            SessionManager.sendStringData(REQUEST_CODE_ARRAY[4] + responseTokenizer.nextToken(""), sessionId);
         } else if (code.equals(REQUEST_CODE_ARRAY[5])) { // Send User Data
             SessionManager.sendStringData(code + responseTokenizer.nextToken(""), sessionId);
         } else if (code.equals(REQUEST_CODE_ARRAY[6])) { // Send Update Logs
