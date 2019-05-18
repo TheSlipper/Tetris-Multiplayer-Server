@@ -36,10 +36,6 @@ public class Server {
         System.out.print("Server password: ");
         String passwd = sc.nextLine();
 
-//        if (!DBQueryManager.areLoginCredentialsValid(login, passwd)) { TODO: Finish this
-//            System.out.println("[Error: No such login or password]");
-//            System.exit(-1);
-//        } else {
             System.out.println("[Successfully logged in]");
             Server.username = login;
             cmdManager.manageCommand("clear");
