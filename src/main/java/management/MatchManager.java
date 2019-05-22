@@ -2,6 +2,7 @@ package management;
 
 import connection.Match;
 import connection.MatchTask;
+import connection.Session;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,11 +27,6 @@ public class MatchManager extends Thread {
     @Override
     public void run() {
         while (true) {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             for (MatchTask task : MatchManager.matchTasks) {
                 if (task.isScheduledForNow() && !task.isBeingAccessed()) {
                     task.setAccessed(true);
@@ -38,6 +34,8 @@ public class MatchManager extends Thread {
                     break;
                 }
             }
+            for (Match match : MatchManager.matches)
+                match.processData();
         }
     }
 
@@ -46,6 +44,11 @@ public class MatchManager extends Thread {
         ResultSet rs1, rs2;
         String opponentDBSessionId = Integer.toString(SessionManager.getSession(opponentSessionId).getDbUserNameId());
         String sessionDBId = Integer.toString(SessionManager.getSession(sessionId).getDbUserNameId());
+        int matchId = matches.size();
+        Session s1 = SessionManager.getSession(sessionId), s2 = SessionManager.getSession(opponentSessionId);
+        s1.setMatchId(matchId);
+        s2.setMatchId(matchId);
+
         rs1 = DBQueryManager.runSQLQuerry("SELECT * FROM `TetrisMP`.`users`, `TetrisMP`.`user_game_data`" +
             " WHERE user_game_data.user_id=" + sessionDBId + " AND " + "users.user_id=" + sessionDBId);
         rs2 = DBQueryManager.runSQLQuerry("SELECT * FROM `TetrisMP`.`users`, `TetrisMP`.`user_game_data`" +
@@ -75,6 +78,8 @@ public class MatchManager extends Thread {
 
         ResponseManager.processResponse(sb2.toString(), sessionId);
         ResponseManager.processResponse(sb1.toString(), opponentSessionId);
+
+        matches.add(new Match(s1, s2));
     }
 
     private void handleTask(int taskId, String taskName, String taskContent) {
@@ -117,4 +122,7 @@ public class MatchManager extends Thread {
         MatchManager.addMatchTask(task);
     }
 
+    public static void addFieldData(int matchId, int sessionId, String fieldData) {
+        MatchManager.matches.get(matchId).updateField(sessionId, fieldData);
+    }
 }

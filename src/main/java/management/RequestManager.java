@@ -13,7 +13,8 @@ public class RequestManager {
             "GAME_SEARCH",
             "CANCEL_SEARCH",
             "ABORT_GAME",
-            "GET_UPDATE_LOGS"
+            "GET_UPDATE_LOGS",
+            "P_F_DATA"
     };
 
     private static boolean containsCode(String code) {
@@ -77,6 +78,10 @@ public class RequestManager {
                 sb.append(news.getString("update_log_date") + "\r\n");
             }
             return ResponseManager.processResponse("SEND_UPDATE_LOGS\r\n" + sb.toString(), sessionId);
+        } else if (code.equals(REQUEST_CODE_ARRAY[7])) { // Player Field Data
+            int matchId = Integer.parseInt(requestTokenized.nextToken());
+            MatchManager.addFieldData(matchId, sessionId, requestTokenized.nextToken(""));
+            return true;
         } else {
             return false;
         }

@@ -18,6 +18,8 @@ public class Session extends Thread {
 
     private int dbUsernameId;
 
+    private int matchId = -1;
+
     private boolean connected = false;
 
     private boolean playing = false;
@@ -103,6 +105,10 @@ public class Session extends Thread {
 
     public void setPlaying(boolean playing) {
         this.playing = playing;
+    }
+
+    public void setMatchId(int id) {
+        this.matchId = id;
     }
 
     public void setDbUsernameId(int id) {
