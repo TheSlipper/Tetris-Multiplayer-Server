@@ -34,6 +34,7 @@ public class MatchManager extends Thread {
                     break;
                 }
             }
+
             for (Match match : MatchManager.matches)
                 match.processData();
         }
@@ -75,6 +76,8 @@ public class MatchManager extends Thread {
         sb2.append(rs2.getString("time_played") + " ");
         sb1.append(rs1.getString("username") + " ");
         sb2.append(rs2.getString("username") + " ");
+        sb1.append(matchId);
+        sb2.append(matchId);
 
         ResponseManager.processResponse(sb2.toString(), sessionId);
         ResponseManager.processResponse(sb1.toString(), opponentSessionId);
