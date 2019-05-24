@@ -4,8 +4,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.StringTokenizer;
 
+/**
+ * This class manages incoming data and executes specific tasks.
+ *
+ */
 public class RequestManager {
 
+    /** List of various request codes */
     private final static String[] REQUEST_CODE_ARRAY = {
             "LOGIN",
             "LOGOUT",
@@ -17,6 +22,12 @@ public class RequestManager {
             "P_F_DATA"
     };
 
+    /**
+     * Checks whether the request code is in the request code array
+     *
+     * @param code codename
+     * @return true if there is such a code
+     */
     private static boolean containsCode(String code) {
         for (String str : REQUEST_CODE_ARRAY) {
             if (str.equals(code))
@@ -25,6 +36,15 @@ public class RequestManager {
         return false;
     }
 
+    /**
+     * Redirects the request to a specific method/class to be executed or executes the request inside of its body
+     *
+     * @param code codename of the request
+     * @param requestTokenized tokenized request arguments/data
+     * @param sessionId session id of the request sender
+     * @return returns the execution status
+     * @throws SQLException on incorrect query or request
+     */
     private static boolean redirectRequest(String code, StringTokenizer requestTokenized, int sessionId) throws SQLException {
         if (code.equals(REQUEST_CODE_ARRAY[0])) { // log in
             String login = requestTokenized.nextToken();
@@ -87,6 +107,13 @@ public class RequestManager {
         }
     }
 
+    /**
+     * Public wrapper of multiple methods for handling requests in one method
+     *
+     * @param requestData string data of the request
+     * @param sessionId session id of the request sender
+     * @return execution status of the request
+     */
     public static boolean processRequest(String requestData, int sessionId) {
         StringTokenizer requestTokenized = new StringTokenizer(requestData);
         String code = requestTokenized.nextToken();

@@ -6,16 +6,33 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
+/**
+ * This class manages all of the connected sessions.
+ */
 public class SessionManager extends Thread {
 
+    /** Server socket of the server */
     private ServerSocket serverSocket;
 
+    /** List of active sessions */
     private static ArrayList<Session> sessions = new ArrayList<Session>();
 
+    /**
+     * Default constructor
+     *
+     * @param ipAddr ip address
+     * @param port port
+     * @throws IOException on occupied port
+     */
     public SessionManager(String ipAddr, int port) throws IOException {
         this.serverSocket = new ServerSocket(port);
     }
 
+    /**
+     * Gets a new session with initialized data
+     *
+     * @return new initialized session
+     */
     private Session getNewSession() {
         Session session = null;
         try {
@@ -26,17 +43,19 @@ public class SessionManager extends Thread {
         return session;
     }
 
+    /**
+     * Shuts down a session with the given sessionId
+     *
+     * @param sessionId id of the target session
+     */
     public static void shutdownSession(int sessionId) {
         SessionManager.sessions.get(sessionId).closeConnection();
         SessionManager.sessions.set(sessionId, new Session());
     }
 
-    public static void suddenShutdownSession(int sessionId) {
-        Session s = SessionManager.sessions.get(sessionId);
-        SessionManager.sendStringData("SUDDEN_SHUTDOWN", s.getSessionId());
-        s.closeConnection();
-    }
-
+    /**
+     * Shuts down all of the sessions
+     */
     public static void shutdownSessions() {
         for (Session s : sessions) {
             if (s.isConnected())
@@ -45,14 +64,25 @@ public class SessionManager extends Thread {
         }
     }
 
-    public static void sendStringData(String data, int id) {
+    /**
+     * Sends string data to the session with the specified session id
+     *
+     * @param data string content of the message
+     * @param sessionId id of the target receiver
+     */
+    public static void sendStringData(String data, int sessionId) {
         try {
-            SessionManager.sessions.get(id).sendStringData(data);
+            SessionManager.sessions.get(sessionId).sendStringData(data);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Get all the connected IP addresses
+     *
+     * @return array of ip addresses in string format
+     */
     public static String[] getIPs() {
         String[] ipArr = new String[sessions.size()];
         for (int i = 0; i < sessions.size(); i++)
@@ -60,14 +90,29 @@ public class SessionManager extends Thread {
         return ipArr;
     }
 
+    /**
+     * Assigns tetris multiplayer's database user id to a specific session
+     *
+     * @param sessionId target session id
+     * @param dbId user id
+     */
     public static void assignDbId(int sessionId, int dbId) {
         SessionManager.sessions.get(sessionId).setDbUsernameId(dbId);
     }
 
+    /**
+     * Gets the specified session
+     *
+     * @param sessionId target session id
+     * @return specified session
+     */
     public static Session getSession(int sessionId) {
         return SessionManager.sessions.get(sessionId);
     }
 
+    /**
+     * Runs the thread of session manager for handling incoming sessions
+     */
     @Override
     public void run() {
         for (int i = 0; i <= SessionManager.sessions.size(); i++) {
