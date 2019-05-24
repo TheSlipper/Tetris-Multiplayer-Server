@@ -11,19 +11,30 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+/**
+ * This class manages all of the game's match related data: match queueing, handling match tasks, sending player's tetris field information and match disconnection.
+ *
+ */
 public class MatchManager extends Thread {
 
+    /** List of currently ongoing game matches */
     private static ArrayList<Match> matches = new ArrayList<Match>();
 
+    /** List of currently scheduled match tasks */
     private static ArrayList<MatchTask> matchTasks = new ArrayList<MatchTask>();
 
+    /** List of users waiting for a match */
     private static HashMap<Integer, Integer> matchQueue = new HashMap<Integer, Integer>();
 
-    private static String[] matchTaskNames = {
+    /** List of match related communication codes */
+    private final static String[] MATCH_TASK_NAMES = {
             "GAME_SETUP",
             "SEND_OPPONENT_DATA"
     };
 
+    /**
+     * Runs the thread of match manager class that is responsible for handling match tasks and for processing match data in the respective order
+     */
     @Override
     public void run() {
         while (true) {
@@ -40,6 +51,13 @@ public class MatchManager extends Thread {
         }
     }
 
+    /**
+     * Sets up a match with two given session ids
+     *
+     * @param sessionId player 1's session id
+     * @param opponentSessionId player 2's session id
+     * @throws SQLException on incorrectly initialized player's database id
+     */
     private void setUpMatch(int sessionId, int opponentSessionId) throws SQLException {
         StringBuilder sb1 = new StringBuilder(), sb2 = new StringBuilder();
         ResultSet rs1, rs2;
@@ -85,8 +103,15 @@ public class MatchManager extends Thread {
         matches.add(new Match(s1, s2));
     }
 
+    /**
+     * Handles a scheduled match task
+     *
+     * @param taskId id of the scheduled task
+     * @param taskName name of the task
+     * @param taskContent passed arguments/information about the task
+     */
     private void handleTask(int taskId, String taskName, String taskContent) {
-        if (taskName.equals(MatchManager.matchTaskNames[0])) { // Game Setup
+        if (taskName.equals(MatchManager.MATCH_TASK_NAMES[0])) { // Game Setup
             int sessionId = MatchManager.matchTasks.get(taskId).getConcernedUserId();
             int elo = Integer.parseInt(MatchManager.matchTasks.get(taskId).getTaskContent().substring(1));
             if (MatchManager.matchQueue.isEmpty())
@@ -105,16 +130,28 @@ public class MatchManager extends Thread {
                     e.printStackTrace();
                 }
             }
-        } else if (taskName.equals(MatchManager.matchTaskNames[1])) { // Send opponent data
+        } else if (taskName.equals(MatchManager.MATCH_TASK_NAMES[1])) { // Send opponent data
 
         }
         MatchManager.matchTasks.remove(taskId);
     }
 
+    /**
+     * Adds a new match task to the scheduled task list
+     *
+     * @param task task object
+     */
     public static void addMatchTask(MatchTask task) {
         MatchManager.matchTasks.add(task);
     }
 
+    /**
+     * Creates and adds a match to the match task queue with the specified data
+     *
+     * @param taskName name of the task
+     * @param taskContent content/arguments of the task; <b>The first argument of taskContent must be the concerned user's ID</b>
+     * @param scheduleTimeInPOSIXSeconds scheduled POSIX time of task execution
+     */
     public static void addMatchTask(String taskName, String taskContent, long scheduleTimeInPOSIXSeconds) {
         // Always keep in mind that when you're adding a task this way you need to specify the concerned user's id
         // in the first argument of the task's content
@@ -125,6 +162,13 @@ public class MatchManager extends Thread {
         MatchManager.addMatchTask(task);
     }
 
+    /**
+     * Adds tetris field data to the specified match
+     *
+     * @param matchId id of the match
+     * @param sessionId session id of the client that the field originated from
+     * @param fieldData field data in string format
+     */
     public static void addFieldData(int matchId, int sessionId, String fieldData) {
         MatchManager.matches.get(matchId).updateField(sessionId, fieldData);
     }

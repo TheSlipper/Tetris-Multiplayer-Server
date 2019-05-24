@@ -8,40 +8,51 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-// TODO: SU mode
-
+/**
+ * This class manages the whole Tetris Multiplayer Server program.<br><br>
+ *
+ * Server class is a singleton class that manages the whole Tetris Multiplayer Server program, initializes all of the server's components and accepts command input from the user after the startup.
+ *
+ * @author Kornel Domeradzki
+ * @version Indev 0.0.1 May 24, 2019
+ */
 public class Server {
 
+    /** Access point to all of the sessions */
     private static SessionManager sessionManager;
 
+    /** Access point to the database query management class */
     private static DBQueryManager queryManager;
 
+    /** Access point to the command management class */
     private static CommandManager cmdManager;
 
+    /** Access point to the match management class */
     private static MatchManager matchManager;
 
+    /** Username used by server's pseudo-bash-like shell */
     private static String username = "slipper"; // TODO: Load from database
 
-    private static boolean rootMode = false;
-
+    /** Constant IP address of the server */
     private static final String IP_ADDR = "localhost";
 
+    /** Constant port of the server */
     private static final int PORT = 7001;
 
+    /**
+     * login method is a method responsible for user login
+     */
     private static void login() {
-        System.out.println("[Initializing command-line interface]");
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Server Login: ");
-        String login = sc.nextLine();
-        System.out.print("Server password: ");
-        String passwd = sc.nextLine();
-
-            System.out.println("[Successfully logged in]");
-            Server.username = login;
-            cmdManager.manageCommand("clear");
-//        }
+        Server.username = DBQueryManager.getUsername();
+        System.out.println("[Successfully logged in]");
+        cmdManager.manageCommand("clear");
     }
 
+    /**
+     * initServer method initializes server's components<br><br>
+     *
+     * It is responsible for creation of SessionManager, CommandManager, MatchManager and is an entry point for the runServer method
+     */
     private static void initServer() {
         try {
             Server.sessionManager = new SessionManager(Server.IP_ADDR, Server.PORT);
@@ -59,6 +70,13 @@ public class Server {
         }
     }
 
+    /**
+     * runServer method runs the server after initialization and accepts server-side commands
+     *
+     * runServer method is a method responsible for constant command input and session and match manager start
+     *
+     * @throws UnknownHostException
+     */
     private static void runServer() throws UnknownHostException {
         Server.sessionManager.start();
         Server.matchManager.start();
@@ -76,16 +94,18 @@ public class Server {
             Scanner sc = new Scanner(System.in);
             String cmd;
             System.out.print("tetris-mp: ");
-            if (!Server.rootMode)
-                System.out.print(Server.username + "$ ");
-            else
-                System.out.print("root$ ");
+            System.out.print(Server.username + "$ ");
             cmd = sc.nextLine();
             if (!cmdManager.manageCommand(cmd))
                 System.err.println("Error occurred while executing [" + cmd + "]");
         }
     }
 
+    /**
+     * Main method responsible for parsing the passed arguments
+     *
+     * @param args cli arguments
+     */
     public static void main(String[] args) {
         Server.initServer();
     }
