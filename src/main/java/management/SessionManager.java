@@ -1,8 +1,10 @@
 package management;
 
 import connection.Session;
+import connection.UDPServerSocket;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
@@ -12,20 +14,30 @@ import java.util.ArrayList;
 public class SessionManager extends Thread {
 
     /** Server socket of the server */
-    private ServerSocket serverSocket;
+    private ServerSocket tcpServerSocket;
+
+    private UDPServerSocket udpServerSocket;
 
     /** List of active sessions */
     private static ArrayList<Session> sessions = new ArrayList<Session>();
 
+    /** Port of the server */
+    private int port;
+
     /**
      * Default constructor
      *
-     * @param ipAddr ip address
+     * @param usesTcp determines which sockets should be used
      * @param port port
      * @throws IOException on occupied port
      */
-    public SessionManager(String ipAddr, int port) throws IOException {
-        this.serverSocket = new ServerSocket(port);
+    public SessionManager(boolean usesTcp, int port) throws IOException {
+        this.setName("SessionManager-Thread");
+        this.port = port;
+        if (usesTcp)
+            this.tcpServerSocket = new ServerSocket(port);
+        else
+            this.udpServerSocket = new UDPServerSocket(port);
     }
 
     /**
@@ -33,14 +45,46 @@ public class SessionManager extends Thread {
      *
      * @return new initialized session
      */
-    private Session getNewSession() {
+    private Session getNewSession(int sessionId) {
         Session session = null;
         try {
-            session = new Session(serverSocket, SessionManager.sessions.size());
+            if (this.tcpServerSocket == null) {// UDP
+                InetAddress addr = udpServerSocket.accept(sessionId);
+                session = new Session(sessionId, addr,this.port + sessionId + 1);
+            }
+            else // TCP
+                session = new Session(tcpServerSocket, sessionId);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return session;
+    }
+
+    /**
+     * Sets up a new session in the specified sessionId
+     *
+     * @param sessionId id of the session
+     */
+    private void setUpNewSession(int sessionId) {
+        Session session = null;
+        try {
+            if (this.tcpServerSocket == null) {
+                session = SessionManager.sessions.get(sessionId);
+                InetAddress addr = udpServerSocket.accept(sessionId);
+                session.connect(sessionId, addr, this.port + sessionId);
+            }
+            else {
+                session = SessionManager.sessions.get(sessionId);
+                session.connect(tcpServerSocket, sessionId);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        SessionManager.sessions.set(sessionId, session);
+        SessionManager.sessions.get(sessionId).start();
     }
 
     /**
@@ -116,18 +160,13 @@ public class SessionManager extends Thread {
     @Override
     public void run() {
         for (int i = 0; i <= SessionManager.sessions.size(); i++) {
-            if (i == SessionManager.sessions.size()) {
-                SessionManager.sessions.add(this.getNewSession());
+            if (SessionManager.sessions.isEmpty() || i == SessionManager.sessions.size()) {
+                SessionManager.sessions.add(this.getNewSession(i));
                 SessionManager.sessions.get(i).start();
                 i = -1;
             } else if (!SessionManager.sessions.get(i).isConnected()) {
-                try {
-                    SessionManager.sessions.get(i).connect(serverSocket, i);
-                    SessionManager.sessions.get(i).start();
-                    i = -1;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                this.setUpNewSession(i);
+                i = -1;
             }
         }
     }

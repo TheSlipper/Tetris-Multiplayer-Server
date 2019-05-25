@@ -3,12 +3,15 @@ package connection;
 import management.RequestManager;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 
 public class Session extends Thread {
 
-    private Socket socket = new Socket();
+    private Socket tcpClientSocket = new Socket();
+
+    private DatagramSocket udpClientSocket;
+
+    private InetAddress ipAddress;
 
     private BufferedInputStream bufferedInputStream;
 
@@ -20,6 +23,8 @@ public class Session extends Thread {
 
     private int matchId = -1;
 
+    private boolean usesTcp;
+
     private boolean connected = false;
 
     private boolean playing = false;
@@ -29,20 +34,47 @@ public class Session extends Thread {
     public Session() {}
 
     public Session(ServerSocket serverSocket, int sessionId) throws IOException {
+        this.setName("Session-Thread-" + sessionId);
         this.connect(serverSocket, sessionId);
+        this.connected = true;
+    }
+
+    public Session(int sessionId, InetAddress addr, int portId) throws SocketException {
+        this.setName("Session-Thread-" + sessionId);
+        this.ipAddress = addr;
+        this.usesTcp = false;
+        this.udpClientSocket = new DatagramSocket(portId);
+        this.connected = true;
+    }
+
+    private void tcpRead() throws IOException {
+        byte[] byteArr = new byte[512];
+        int length = this.bufferedInputStream.read(byteArr);
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < length; i++)
+            sb.append((char)byteArr[i]);
+
+        if (!sb.toString().equals("") && !RequestManager.processRequest(sb.toString(), this.sessionId))
+            System.err.println("\r\n[Error in communication between host and the client]");
+    }
+
+    private void udpRead() throws IOException {
+        byte[] byteArr = new byte[512];
+        DatagramPacket datagramPacket = new DatagramPacket(byteArr, 0, byteArr.length);
+        this.udpClientSocket.receive(datagramPacket);
+        String content = new String(datagramPacket.getData());
+
+        if (!content.equals("") && !RequestManager.processRequest(content, this.sessionId))
+            System.err.println("\r\n[Error in communication between host and the client]");
     }
 
     private void messageLoop() throws IOException {
         while (true) {
-            byte[] byteArr = new byte[512];
-            int length = bufferedInputStream.read(byteArr);
-            StringBuilder sb = new StringBuilder();
-
-            for (int i = 0; i < length; i++)
-                sb.append((char)byteArr[i]);
-
-            if (!sb.toString().equals("") && !RequestManager.processRequest(sb.toString(), this.sessionId))
-                System.err.println("\r\n[Error in communication between host and the client]");
+            if (this.usesTcp)
+                this.tcpRead();
+            else
+                this.udpRead();
 
             if (!this.connected)
                 return;
@@ -51,7 +83,7 @@ public class Session extends Thread {
 
     public String getIp() {
         if (this.connected)
-            return socket.getInetAddress().getAddress().toString();
+            return tcpClientSocket.getInetAddress().getAddress().toString();
         else
             return "[Not connected]";
     }
@@ -68,31 +100,50 @@ public class Session extends Thread {
 
     public void closeConnection() {
         try {
-            if (this.socket.isConnected())
-            {
-                this.socket.shutdownInput();
-                this.socket.close();
+            if (this.usesTcp && this.tcpClientSocket.isConnected()) {
+                this.tcpClientSocket.shutdownInput();
+                this.tcpClientSocket.close();
+            }
+            else if (!this.usesTcp && !this.connected) {
+                this.udpClientSocket.disconnect();
+                this.udpClientSocket.close();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.connected = false;
     }
 
     public void sendStringData(String data) throws IOException {
-        bufferedOutputStream.write(data.getBytes(), 0, data.length());
-        bufferedOutputStream.flush();
+        if (this.usesTcp) {
+            bufferedOutputStream.write(data.getBytes(), 0, data.length());
+            bufferedOutputStream.flush();
+        } else {
+            DatagramPacket dp = new DatagramPacket(data.getBytes(), data.length(), this.ipAddress, 7000);
+            this.udpClientSocket.send(dp);
+        }
     }
 
     public boolean isConnected() {
-        return this.socket.isConnected();
+        if (this.usesTcp)
+            return this.tcpClientSocket.isConnected();
+        else
+            return this.connected;
     }
 
     public void connect(ServerSocket serverSocket, int sessionId) throws IOException {
-        this.socket = serverSocket.accept();
-        this.bufferedInputStream = new BufferedInputStream(this.socket.getInputStream());
-        this.bufferedOutputStream = new BufferedOutputStream(this.socket.getOutputStream());
-        this.sessionId = sessionId;
-        this.connected = true;
+            this.tcpClientSocket = serverSocket.accept();
+            this.bufferedInputStream = new BufferedInputStream(this.tcpClientSocket.getInputStream());
+            this.bufferedOutputStream = new BufferedOutputStream(this.tcpClientSocket.getOutputStream());
+            this.sessionId = sessionId;
+            this.connected = true;
+    }
+
+    public void connect(int sessionId, InetAddress addr, int portId) throws SocketException {
+        this.setName("Session-Thread-" + sessionId);
+        this.ipAddress = addr;
+        this.usesTcp = false;
+        this.udpClientSocket = new DatagramSocket(portId + (sessionId+1));
     }
 
     public int getSessionId() {
