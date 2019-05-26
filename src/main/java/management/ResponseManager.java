@@ -12,8 +12,8 @@ public class ResponseManager {
 
     /** List of various response codes */
     private final static String[] RESPONSE_CODE_ARRAY = {
-            "MAINTENANCE_SHUTDOWN",
-            "SUDDEN_SHUTDOWN",
+//            "MAINTENANCE_SHUTDOWN",
+//            "SUDDEN_SHUTDOWN",
             "INCORRECT_CREDENTIALS",
             "CORRECT_CREDENTIALS",
             "GAME_SETUP",
@@ -45,24 +45,16 @@ public class ResponseManager {
      * @throws SQLException on incorrect query or response
      */
     private static boolean redirectResponse(String code, StringTokenizer responseTokenized, int sessionId) throws SQLException {
-        if (code.equals(RESPONSE_CODE_ARRAY[0])) { // Maintenance shutdown
-            System.out.println("[Maintenance shutdown response not implemented yet]");
-        } else if (code.equals(RESPONSE_CODE_ARRAY[1])) { // Sudden shutdown
-            System.out.println("[Sudden shutdown response not implemented yet]");
-        } else if (code.equals(RESPONSE_CODE_ARRAY[2])) { // Incorrect credentials
-            SessionManager.sendStringData(RESPONSE_CODE_ARRAY[2] + " " + responseTokenized.nextToken(), sessionId);
-        } else if (code.equals(RESPONSE_CODE_ARRAY[3])) { // Correct credentials
+        if (code.equals(RESPONSE_CODE_ARRAY[0])) { // Incorrect credentials
+            SessionManager.sendStringData(code + " " + responseTokenized.nextToken(), sessionId);
+        } else if (code.equals(RESPONSE_CODE_ARRAY[1])) { // Correct credentials
             String username = responseTokenized.nextToken();
-            ResultSet rs = DBQueryManager.runSQLQuerry("SELECT user_id FROM `TetrisMP`.`users` WHERE username=\""
-                            + username + "\"");
-            rs.next();
-            SessionManager.assignDbId(sessionId, rs.getInt("user_id"));
-            SessionManager.sendStringData(RESPONSE_CODE_ARRAY[3] + " " + username, sessionId);
-        } else if (code.equals(RESPONSE_CODE_ARRAY[4])) { // Game set up
-            SessionManager.sendStringData(RESPONSE_CODE_ARRAY[4] + responseTokenized.nextToken(""), sessionId);
-        } else if (code.equals(RESPONSE_CODE_ARRAY[5])) { // Send User Data
+            SessionManager.sendStringData(code + " " + username, sessionId);
+        } else if (code.equals(RESPONSE_CODE_ARRAY[2])) { // Game set up
+            SessionManager.sendStringData(RESPONSE_CODE_ARRAY[2] + responseTokenized.nextToken(""), sessionId);
+        } else if (code.equals(RESPONSE_CODE_ARRAY[3])) { // Send User Data
             SessionManager.sendStringData(code + responseTokenized.nextToken(""), sessionId);
-        } else if (code.equals(RESPONSE_CODE_ARRAY[6])) { // Send Update Logs
+        } else if (code.equals(RESPONSE_CODE_ARRAY[4])) { // Send Update Logs
             SessionManager.sendStringData(code + responseTokenized.nextToken(""), sessionId);
         }
 
