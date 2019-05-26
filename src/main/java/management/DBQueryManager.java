@@ -88,8 +88,8 @@ public class DBQueryManager {
      * @throws SQLException on incorrect query or when illegal characters are passed
      */
     public static boolean areLoginCredentialsValid(String login, String passwd) throws SQLException {
-        String query = "SELECT user_id FROM `TetrisMP`.`users` WHERE username=\""
-                + login + "\" AND user_password=\"" + passwd + "\"";
+        String query = "SELECT user_id FROM `TetrisMP`.`users` WHERE username='"
+                + login + "' AND user_password='" + passwd + "'";
         ResultSet myRs = DBQueryManager.runSQLQuerry(query);
         return myRs.next();
     }

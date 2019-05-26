@@ -29,7 +29,6 @@ public class UDPServerSocket {
         while(true) {
             dp = new DatagramPacket(buffer, 0, buffer.length);
             socket.receive(dp);
-            System.out.println("Content: " + new String(dp.getData()));
             if (new String(dp.getData()).startsWith(this.PORT_ALLOCATION_REQUEST))
                 break;
         }

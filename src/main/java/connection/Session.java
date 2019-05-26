@@ -37,6 +37,7 @@ public class Session extends Thread {
         this.setName("Session-Thread-" + sessionId);
         this.connect(serverSocket, sessionId);
         this.connected = true;
+        this.usesTcp = true;
     }
 
     public Session(int sessionId, InetAddress addr, int portId) throws SocketException {
@@ -100,11 +101,9 @@ public class Session extends Thread {
 
     public void closeConnection() {
         try {
-            if (this.usesTcp && this.tcpClientSocket.isConnected()) {
-                this.tcpClientSocket.shutdownInput();
+            if (this.usesTcp)
                 this.tcpClientSocket.close();
-            }
-            else if (!this.usesTcp && !this.connected) {
+            else if (!this.usesTcp) {
                 this.udpClientSocket.disconnect();
                 this.udpClientSocket.close();
             }

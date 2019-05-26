@@ -16,6 +16,7 @@ public class SessionManager extends Thread {
     /** Server socket of the server */
     private ServerSocket tcpServerSocket;
 
+    /** Modified socket for simulating ServerSocket behaviour */
     private UDPServerSocket udpServerSocket;
 
     /** List of active sessions */
@@ -49,11 +50,11 @@ public class SessionManager extends Thread {
         Session session = null;
         try {
             if (this.tcpServerSocket == null) {// UDP
-                InetAddress addr = udpServerSocket.accept(sessionId);
+                InetAddress addr = this.udpServerSocket.accept(sessionId);
                 session = new Session(sessionId, addr,this.port + sessionId + 1);
             }
             else // TCP
-                session = new Session(tcpServerSocket, sessionId);
+                session = new Session(this.tcpServerSocket, sessionId);
 
         } catch (IOException e) {
             e.printStackTrace();
