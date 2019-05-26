@@ -75,7 +75,7 @@ public class RequestManager {
             ResultSet rs = DBQueryManager.runSQLQuerry("SELECT elo FROM `TetrisMP`.`user_game_data`"
                             + " WHERE user_id=" + SessionManager.getSession(sessionId).getDbUserNameId());
             rs.next();
-            MatchManager.addMatchTask("GAME_SETUP", Integer.toString(sessionId) + " "
+            MatchManager.addMatchTask("GAME_SETUP", sessionId + " "
                             + rs.getString("elo"), System.currentTimeMillis() / 1000);
             return true;
         } else if (code.equals(REQUEST_CODE_ARRAY[4])) { // Cancel Search

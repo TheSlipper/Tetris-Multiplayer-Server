@@ -38,6 +38,14 @@ public class MatchManager extends Thread {
     @Override
     public void run() {
         while (true) {
+            if (matches.isEmpty()) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
             for (MatchTask task : MatchManager.matchTasks) {
                 if (task.isScheduledForNow() && !task.isBeingAccessed()) {
                     task.setAccessed(true);
@@ -112,11 +120,13 @@ public class MatchManager extends Thread {
      */
     private void handleTask(int taskId, String taskName, String taskContent) {
         if (taskName.equals(MatchManager.MATCH_TASK_NAMES[0])) { // Game Setup
+            System.out.println("Index (taskId): " + taskId);
+            System.out.println("MatchManager.matchTasks size: " + MatchManager.matchTasks.size());
             int sessionId = MatchManager.matchTasks.get(taskId).getConcernedUserId();
             int elo = Integer.parseInt(MatchManager.matchTasks.get(taskId).getTaskContent().substring(1));
-            if (MatchManager.matchQueue.isEmpty())
+            if (MatchManager.matchQueue.isEmpty()) {
                 MatchManager.matchQueue.put(sessionId, elo);
-            else {
+            }else {
                 int opponentSessionId = -1;
                 int opponentElo = -1;
                 for (Map.Entry<Integer, Integer> person : MatchManager.matchQueue.entrySet()) {

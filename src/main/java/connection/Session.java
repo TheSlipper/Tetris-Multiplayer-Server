@@ -49,6 +49,10 @@ public class Session extends Thread {
     }
 
     private void tcpRead() throws IOException {
+        if (!this.usesTcp) {
+            this.udpRead();
+            return;
+        }
         byte[] byteArr = new byte[512];
         int length = this.bufferedInputStream.read(byteArr);
         StringBuilder sb = new StringBuilder();
@@ -61,6 +65,10 @@ public class Session extends Thread {
     }
 
     private void udpRead() throws IOException {
+        if (this.usesTcp) {
+            this.tcpRead();
+            return;
+        }
         byte[] byteArr = new byte[512];
         DatagramPacket datagramPacket = new DatagramPacket(byteArr, 0, byteArr.length);
         this.udpClientSocket.receive(datagramPacket);
