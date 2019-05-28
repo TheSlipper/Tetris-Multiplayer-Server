@@ -31,6 +31,24 @@ public class Session extends Thread {
 
     private boolean inQueue = false;
 
+
+
+    private int elo = 800;
+
+    private int privilegeGroup = -1;
+
+    private int unrankedWins = 0;
+
+    private int unrankedLosses = 0;
+
+    private int rankedWins = 0;
+
+    private int rankedLosses = 0;
+
+    private long tetrominoPoints = 0;
+
+    private long timePlayed = 0;
+
     public Session() {}
 
     public Session(ServerSocket serverSocket, int sessionId) throws IOException {
@@ -111,23 +129,28 @@ public class Session extends Thread {
         try {
             if (this.usesTcp)
                 this.tcpClientSocket.close();
-            else if (!this.usesTcp) {
+            else if (!this.usesTcp && this.udpClientSocket != null) {
                 this.udpClientSocket.disconnect();
                 this.udpClientSocket.close();
             }
+            else
+                return;
         } catch (IOException e) {
             e.printStackTrace();
         }
         this.connected = false;
     }
 
-    public void sendStringData(String data) throws IOException {
+    public boolean sendStringData(String data) throws IOException {
         if (this.usesTcp) {
             bufferedOutputStream.write(data.getBytes(), 0, data.length());
             bufferedOutputStream.flush();
+            return true;
         } else {
+            // TODO: Package data sent validation
             DatagramPacket dp = new DatagramPacket(data.getBytes(), data.length(), this.ipAddress, 7000);
             this.udpClientSocket.send(dp);
+            return true;
         }
     }
 
@@ -175,5 +198,69 @@ public class Session extends Thread {
 
     public int getDbUserNameId() {
         return this.dbUsernameId;
+    }
+
+    public int getElo() {
+        return elo;
+    }
+
+    public void setElo(int elo) {
+        this.elo = elo;
+    }
+
+    public int getUnrankedWins() {
+        return unrankedWins;
+    }
+
+    public void setUnrankedWins(int unrankedWins) {
+        this.unrankedWins = unrankedWins;
+    }
+
+    public int getUnrankedLosses() {
+        return unrankedLosses;
+    }
+
+    public void setUnrankedLosses(int unrankedLosses) {
+        this.unrankedLosses = unrankedLosses;
+    }
+
+    public int getRankedWins() {
+        return rankedWins;
+    }
+
+    public void setRankedWins(int rankedWins) {
+        this.rankedWins = rankedWins;
+    }
+
+    public int getRankedLosses() {
+        return rankedLosses;
+    }
+
+    public void setRankedLosses(int rankedLosses) {
+        this.rankedLosses = rankedLosses;
+    }
+
+    public long getTetrominoPoints() {
+        return tetrominoPoints;
+    }
+
+    public void setTetrominoPoints(long tetrominoPoints) {
+        this.tetrominoPoints = tetrominoPoints;
+    }
+
+    public long getTimePlayed() {
+        return timePlayed;
+    }
+
+    public void setTimePlayed(long timePlayed) {
+        this.timePlayed = timePlayed;
+    }
+
+    public int getPrivilegeGroup() {
+        return privilegeGroup;
+    }
+
+    public void setPrivilegeGroup(int privilegeGroup) {
+        this.privilegeGroup = privilegeGroup;
     }
 }

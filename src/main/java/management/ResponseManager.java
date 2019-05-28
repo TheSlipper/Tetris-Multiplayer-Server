@@ -44,21 +44,21 @@ public class ResponseManager {
      * @return returns the execution status
      * @throws SQLException on incorrect query or response
      */
-    private static boolean redirectResponse(String code, StringTokenizer responseTokenized, int sessionId) throws SQLException {
-        if (code.equals(RESPONSE_CODE_ARRAY[0])) { // Incorrect credentials
-            SessionManager.sendStringData(code + " " + responseTokenized.nextToken(), sessionId);
-        } else if (code.equals(RESPONSE_CODE_ARRAY[1])) { // Correct credentials
+    private static boolean redirectResponse(String code, StringTokenizer responseTokenized, int sessionId) {
+        if (code.equals(RESPONSE_CODE_ARRAY[0])) /* Incorrect credentials */ {
+            return SessionManager.sendStringData(code + " " + responseTokenized.nextToken(), sessionId);
+        } else if (code.equals(RESPONSE_CODE_ARRAY[1])) /* Correct credentials */ {
             String username = responseTokenized.nextToken();
-            SessionManager.sendStringData(code + " " + username, sessionId);
-        } else if (code.equals(RESPONSE_CODE_ARRAY[2])) { // Game set up
-            SessionManager.sendStringData(RESPONSE_CODE_ARRAY[2] + responseTokenized.nextToken(""), sessionId);
-        } else if (code.equals(RESPONSE_CODE_ARRAY[3])) { // Send User Data
-            SessionManager.sendStringData(code + responseTokenized.nextToken(""), sessionId);
-        } else if (code.equals(RESPONSE_CODE_ARRAY[4])) { // Send Update Logs
-            SessionManager.sendStringData(code + responseTokenized.nextToken(""), sessionId);
+            return SessionManager.sendStringData(code + " " + username, sessionId);
+        } else if (code.equals(RESPONSE_CODE_ARRAY[2])) /* Game set up */ {
+            return SessionManager.sendStringData(RESPONSE_CODE_ARRAY[2] + responseTokenized.nextToken(""), sessionId);
+        } else if (code.equals(RESPONSE_CODE_ARRAY[3])) /* Send User Data */ {
+            return SessionManager.sendStringData(code + responseTokenized.nextToken(""), sessionId);
+        } else if (code.equals(RESPONSE_CODE_ARRAY[4])) /* Send Update Logs */ {
+            return SessionManager.sendStringData(code + responseTokenized.nextToken(""), sessionId);
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -75,12 +75,7 @@ public class ResponseManager {
         if (!ResponseManager.containsCode(code))
             return false;
 
-        try {
-            return ResponseManager.redirectResponse(code, responseTokenizer, sessionId);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return ResponseManager.redirectResponse(code, responseTokenizer, sessionId);
     }
 
 }

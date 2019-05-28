@@ -115,11 +115,12 @@ public class SessionManager extends Thread {
      * @param data string content of the message
      * @param sessionId id of the target receiver
      */
-    public static void sendStringData(String data, int sessionId) {
+    public static boolean sendStringData(String data, int sessionId) {
         try {
-            SessionManager.sessions.get(sessionId).sendStringData(data);
+            return SessionManager.sessions.get(sessionId).sendStringData(data);
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
     }
 

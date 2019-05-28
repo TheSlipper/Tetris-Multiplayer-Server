@@ -79,6 +79,11 @@ public class DBQueryManager {
         return  myStmt.executeQuery(sqlQuery);
     }
 
+    public static void runSQLueryNoRet(String sqlQuery) throws SQLException {
+        PreparedStatement ps = DBQueryManager.mySQLConnection.prepareStatement(sqlQuery);
+        ps.executeUpdate();
+    }
+
     /**
      * Checks whether the passed game username credentials are correct
      *
