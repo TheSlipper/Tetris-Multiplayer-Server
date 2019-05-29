@@ -1,12 +1,15 @@
 package connection;
 
 import management.DBQueryManager;
+import management.MatchManager;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.StringTokenizer;
 
 public class Match {
+
+    private int matchId;
 
     private boolean isRanked = false;
 
@@ -30,25 +33,28 @@ public class Match {
 
     private int p2Time;
 
-    public Match(Session p1Session, Session p2Session) {
+    public Match(Session p1Session, Session p2Session, int matchId) {
         this.p1Session = p1Session;
         this.p2Session = p2Session;
+        this.matchId = matchId;
     }
 
     public void processData() {
         if (this.p1FieldData != null) {
+            if (this.p1FieldData.charAt(0) == 'L' && !this.p1Lost)
+                this.sendLossData(this.p1Session.getSessionId(), new StringTokenizer(this.p1FieldData));
             try {
-                System.out.println("Player 1's field data: '" + this.p1FieldData + "'");
-                p2Session.sendStringData(this.p1FieldData);
+                this.p2Session.sendStringData(this.p1FieldData);
                 this.p1FieldData = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         if (this.p2FieldData != null) {
+            if (this.p2FieldData.charAt(0) == 'L' && !this.p2Lost)
+                this.sendLossData(this.p2Session.getSessionId(), new StringTokenizer(this.p2FieldData));
             try {
-                System.out.println("Player 2's field data: '" + this.p2FieldData + "'");
-                p1Session.sendStringData(this.p2FieldData);
+                this.p1Session.sendStringData(this.p2FieldData);
                 this.p2FieldData = null;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -66,15 +72,17 @@ public class Match {
 
 
     public void sendLossData(int sessionId, StringTokenizer lossData) {
+        lossData.nextToken();
         int pts = Integer.parseInt(lossData.nextToken());
-        int time = Integer.parseInt(lossData.nextToken());
+        lossData.nextToken();
+        float time = Float.parseFloat(lossData.nextToken());
         if (sessionId == this.p1Session.getSessionId()) {
             this.p1Pts = pts;
-            this.p1Time = time;
+            this.p1Time = (int)time;
             this.p1Lost = true;
         } else {
             this.p2Pts = pts;
-            this.p2Time = time;
+            this.p2Time = (int)time;
             this.p2Lost = true;
         }
 
@@ -115,8 +123,8 @@ public class Match {
             }
         }
 
-        p1TetrominoPts += 20;
-        p2TetrominoPts += 20;
+        p1TetrominoPts += p1Pts;
+        p2TetrominoPts += p2Pts;
         p1FullTime += this.p1Time;
         p2FullTime += this.p2Time;
 
@@ -130,5 +138,46 @@ public class Match {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        p1Session.setElo(p1Elo);
+        p2Session.setElo(p2Elo);
+        p1Session.setTetrominoPoints(p1TetrominoPts);
+        p2Session.setTetrominoPoints(p2TetrominoPts);
+        p1Session.setTimePlayed(p1FullTime);
+        p2Session.setTimePlayed(p2FullTime);
+        p1Session.setUnrankedWins(p1UnrankedWins);
+        p2Session.setUnrankedWins(p2UnrankedWins);
+        p1Session.setUnrankedLosses(p1UnrankedLosses);
+        p2Session.setUnrankedLosses(p2UnrankedLosses);
+        p1Session.setRankedWins(p1UnrankedWins);
+        p2Session.setRankedWins(p2UnrankedWins);
+        p1Session.setRankedLosses(p1UnrankedLosses);
+        p2Session.setRankedLosses(p2UnrankedLosses);
+
+        MatchManager.addMatchTask("GAME_FINISH", p1Id + " " + Integer.toString(matchId), System.currentTimeMillis() / 1000);
+    }
+
+    public int getP1Pts() {
+        return p1Pts;
+    }
+
+    public int getP2Pts() {
+        return p2Pts;
+    }
+
+    public int getP1Time() {
+        return p1Time;
+    }
+
+    public int getP2Time() {
+        return p2Time;
+    }
+
+    public Session getP1Session() {
+        return p1Session;
+    }
+
+    public Session getP2Session() {
+        return p2Session;
     }
 }

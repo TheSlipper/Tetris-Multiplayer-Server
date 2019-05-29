@@ -6,18 +6,15 @@ public class MatchTask {
 
     private String taskContent;
 
-    private int taskId;
-
     private long scheduleTimeInPOSIXSeconds;
 
     private int concernedUserId;
 
     private boolean accessed = false;
 
-    public MatchTask(String taskName, String taskContent, int taskId, long scheduleTimeInPOSIXSeconds, int userId) {
+    public MatchTask(String taskName, String taskContent, long scheduleTimeInPOSIXSeconds, int userId) {
         this.taskName = taskName;
         this.taskContent = taskContent;
-        this.taskId = taskId;
         this.scheduleTimeInPOSIXSeconds = scheduleTimeInPOSIXSeconds;
         this.concernedUserId = userId;
     }
@@ -28,10 +25,6 @@ public class MatchTask {
 
     public String getTaskContent() {
         return taskContent;
-    }
-
-    public int getTaskId() {
-        return taskId;
     }
 
     public boolean isScheduledForNow() {

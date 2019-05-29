@@ -4,6 +4,7 @@ import connection.Match;
 import connection.MatchTask;
 import connection.Session;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class MatchManager extends Thread {
     /** List of match related communication codes */
     private final static String[] MATCH_TASK_NAMES = {
             "GAME_SETUP",
-            "SEND_OPPONENT_DATA"
+            "GAME_FINISH"
     };
 
     /**
@@ -46,12 +47,15 @@ public class MatchManager extends Thread {
                 }
             }
 
+            int taskId = 0;
             for (MatchTask task : MatchManager.matchTasks) {
                 if (task.isScheduledForNow() && !task.isBeingAccessed()) {
                     task.setAccessed(true);
-                    this.handleTask(task.getTaskId(), task.getTaskName(), task.getTaskContent());
+                    this.handleTask(taskId, task.getTaskName(), task.getTaskContent());
                     break;
                 }
+                else
+                    taskId++;
             }
 
             for (Match match : MatchManager.matches)
@@ -108,7 +112,7 @@ public class MatchManager extends Thread {
         ResponseManager.processResponse(sb2.toString(), sessionId);
         ResponseManager.processResponse(sb1.toString(), opponentSessionId);
 
-        matches.add(new Match(s1, s2));
+        matches.add(new Match(s1, s2, matches.size()));
     }
 
     /**
@@ -119,29 +123,21 @@ public class MatchManager extends Thread {
      * @param taskContent passed arguments/information about the task
      */
     private void handleTask(int taskId, String taskName, String taskContent) {
-        if (taskName.equals(MatchManager.MATCH_TASK_NAMES[0])) { // Game Setup
-            System.out.println("Index (taskId): " + taskId);
-            System.out.println("MatchManager.matchTasks size: " + MatchManager.matchTasks.size());
-            int sessionId = MatchManager.matchTasks.get(taskId).getConcernedUserId();
-            int elo = Integer.parseInt(MatchManager.matchTasks.get(taskId).getTaskContent().substring(1));
-            if (MatchManager.matchQueue.isEmpty()) {
-                MatchManager.matchQueue.put(sessionId, elo);
-            }else {
-                int opponentSessionId = -1;
-                int opponentElo = -1;
-                for (Map.Entry<Integer, Integer> person : MatchManager.matchQueue.entrySet()) {
-                    opponentSessionId = person.getKey();
-                    opponentElo = person.getValue();
-                    break;
-                }
-                try {
-                    this.setUpMatch(sessionId, opponentSessionId);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+        if (taskName.equals(MatchManager.MATCH_TASK_NAMES[0])) /* Game Setup */ {
+            try {
+                this.setupGame(taskId);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } else if (taskName.equals(MatchManager.MATCH_TASK_NAMES[1])) { // Send opponent data
-
+        }
+        else if (taskName.equals(MatchManager.MATCH_TASK_NAMES[1])) /* GAME_FINISH */ {
+            try {
+                this.gameFinish(taskContent);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         MatchManager.matchTasks.remove(taskId);
     }
@@ -167,8 +163,7 @@ public class MatchManager extends Thread {
         // in the first argument of the task's content
         StringTokenizer taskContentTokenized = new StringTokenizer(taskContent);
         int sessionId = Integer.parseInt(taskContentTokenized.nextToken());
-        MatchTask task = new MatchTask(taskName, taskContentTokenized.nextToken(""), matchTasks.size(),
-                scheduleTimeInPOSIXSeconds, sessionId);
+        MatchTask task = new MatchTask(taskName, taskContentTokenized.nextToken(""), scheduleTimeInPOSIXSeconds, sessionId);
         MatchManager.addMatchTask(task);
     }
 
@@ -181,5 +176,75 @@ public class MatchManager extends Thread {
      */
     public static void addFieldData(int matchId, int sessionId, String fieldData) {
         MatchManager.matches.get(matchId).updateField(sessionId, fieldData);
+    }
+
+    /**
+     * Executes the GAME_SETUP task
+     *
+     * @param taskId id of the task
+     */
+    private void setupGame(int taskId) throws SQLException, InterruptedException {
+        int sessionId = MatchManager.matchTasks.get(taskId).getConcernedUserId();
+        int elo = Integer.parseInt(MatchManager.matchTasks.get(taskId).getTaskContent().substring(1));
+        if (MatchManager.matchQueue.isEmpty()) {
+            MatchManager.matchQueue.put(sessionId, elo);
+        }else {
+            int opponentSessionId = -1;
+            int opponentElo = -1;
+            for (Map.Entry<Integer, Integer> person : MatchManager.matchQueue.entrySet()) {
+                opponentSessionId = person.getKey();
+                opponentElo = person.getValue();
+                break;
+            }
+            this.setUpMatch(sessionId, opponentSessionId);
+        }
+    }
+
+    /**
+     * Executes the GAME_FINISH task
+     *
+     * @param taskId id of the task
+     * @param taskContent content of the task
+     */
+    private void gameFinish(String taskContent) throws IOException {
+        final int matchId = Integer.parseInt(new StringTokenizer(taskContent).nextToken());
+        Match match = MatchManager.matches.get(matchId);
+        Session s1 = match.getP1Session(), s2 = match.getP2Session();
+        StringBuilder p1Msg = new StringBuilder(), p2Msg = new StringBuilder();
+        if (match.getP1Pts() > match.getP2Pts()) {
+            p1Msg.append("GAME_WON ");
+            p2Msg.append("GAME_LOST ");
+        } else if (match.getP1Pts() == match.getP2Pts()) {
+            p1Msg.append("GAME_DRAW ");
+            p2Msg.append("GAME_DRAW ");
+        } else {
+            p1Msg.append("GAME_LOST ");
+            p2Msg.append("GAME_WIN ");
+        }
+
+        p1Msg.append(s1.getElo() + " ");
+        p1Msg.append(s1.getUnrankedWins() + " ");
+        p1Msg.append(s1.getUnrankedLosses() + " ");
+        p1Msg.append(s1.getRankedWins() + " ");
+        p1Msg.append(s1.getRankedLosses() + " ");
+        p1Msg.append(s1.getTetrominoPoints() + " ");
+        p1Msg.append(s1.getTimePlayed() + " ");
+        p1Msg.append(match.getP1Pts() + " ");
+        p1Msg.append(match.getP1Time());
+
+        p2Msg.append(s2.getElo() + " ");
+        p2Msg.append(s2.getUnrankedWins() + " ");
+        p2Msg.append(s2.getUnrankedLosses() + " ");
+        p2Msg.append(s2.getRankedWins() + " ");
+        p2Msg.append(s2.getRankedLosses() + " ");
+        p2Msg.append(s2.getTetrominoPoints() + " ");
+        p2Msg.append(s2.getTimePlayed() + " ");
+        p2Msg.append(match.getP2Pts() + " ");
+        p2Msg.append(match.getP2Time());
+
+        s1.sendStringData(p1Msg.toString());
+        s2.sendStringData(p2Msg.toString());
+        match = null;
+        matches.remove(matchId);
     }
 }

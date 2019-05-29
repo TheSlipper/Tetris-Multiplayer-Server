@@ -136,7 +136,7 @@ public class Server {
     public static void main(String[] args) {
         System.out.println("[TCP/UDP]");
         System.out.println("TCP - Slower but reliable");
-        System.out.println("UDP - Faster but less reliable");
+        System.out.println("UDP - Faster but less reliable (Experimental)");
         System.out.print("Do you want to use TCP(t) or UDP(u) sockets: ");
         Scanner sc = new Scanner(System.in);
         String response = sc.nextLine();
