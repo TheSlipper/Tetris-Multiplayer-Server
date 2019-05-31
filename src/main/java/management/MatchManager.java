@@ -201,49 +201,56 @@ public class MatchManager extends Thread {
     }
 
     /**
+     * Gets a StringBuilder object with a formatted endgame message
+     *
+     * @param session1 first game session
+     * @param session2 second game session
+     * @param match match data
+     * @return formatted endgame message
+     */
+    private StringBuilder getGameFinishMsg(Session session1, Session session2, Match match) {
+        StringBuilder builder = new StringBuilder();
+
+        if ((session1.getDbUserNameId() == match.getP1Session().getDbUserNameId() && match.getP1Pts() > match.getP2Pts())
+            || (session1.getDbUserNameId() == match.getP2Session().getDbUserNameId() && match.getP2Pts() > match.getP1Pts())) {
+            builder.append("GAME_WON ");
+        } else if (match.getP1Pts() == match.getP2Pts()) {
+            builder.append("GAME_DRAW ");
+        } else {
+            builder.append("GAME_LOST ");
+        }
+
+        builder.append(session1.getElo() + " " + session2.getElo() + " ");
+        builder.append(session1.getUnrankedWins() + " " + session2.getUnrankedWins() + " ");
+        builder.append(session1.getUnrankedLosses() + " " + session2.getUnrankedLosses() + " ");
+        builder.append(session1.getRankedWins() + " " + session2.getRankedWins() + " ");
+        builder.append(session1.getRankedLosses() + " " + session2.getRankedLosses() + " ");
+        builder.append(session1.getTetrominoPoints() + " " + session2.getTetrominoPoints() + " ");
+        builder.append(session1.getTimePlayed() + " " + session2.getTimePlayed() + " ");
+
+        if (match.getP1Session().getDbUserNameId() == session1.getDbUserNameId()) {
+            builder.append(match.getP1Pts() + " " + match.getP2Pts() + " ");
+            builder.append(match.getP1Time() + " " + match.getP2Time() + " ");
+        } else {
+            builder.append(match.getP2Pts() + " " + match.getP1Pts() + " ");
+            builder.append(match.getP2Time() + " " + match.getP1Time() + " ");
+        }
+        return builder;
+    }
+
+    /**
      * Executes the GAME_FINISH task
      *
-     * @param taskId id of the task
      * @param taskContent content of the task
      */
     private void gameFinish(String taskContent) throws IOException {
         final int matchId = Integer.parseInt(new StringTokenizer(taskContent).nextToken());
         Match match = MatchManager.matches.get(matchId);
         Session s1 = match.getP1Session(), s2 = match.getP2Session();
-        StringBuilder p1Msg = new StringBuilder(), p2Msg = new StringBuilder();
-        if (match.getP1Pts() > match.getP2Pts()) {
-            p1Msg.append("GAME_WON ");
-            p2Msg.append("GAME_LOST ");
-        } else if (match.getP1Pts() == match.getP2Pts()) {
-            p1Msg.append("GAME_DRAW ");
-            p2Msg.append("GAME_DRAW ");
-        } else {
-            p1Msg.append("GAME_LOST ");
-            p2Msg.append("GAME_WIN ");
-        }
 
-        p1Msg.append(s1.getElo() + " ");
-        p1Msg.append(s1.getUnrankedWins() + " ");
-        p1Msg.append(s1.getUnrankedLosses() + " ");
-        p1Msg.append(s1.getRankedWins() + " ");
-        p1Msg.append(s1.getRankedLosses() + " ");
-        p1Msg.append(s1.getTetrominoPoints() + " ");
-        p1Msg.append(s1.getTimePlayed() + " ");
-        p1Msg.append(match.getP1Pts() + " ");
-        p1Msg.append(match.getP1Time());
+        s1.sendStringData(this.getGameFinishMsg(s1, s2, match).toString());
+        s2.sendStringData(this.getGameFinishMsg(s2, s1, match).toString());
 
-        p2Msg.append(s2.getElo() + " ");
-        p2Msg.append(s2.getUnrankedWins() + " ");
-        p2Msg.append(s2.getUnrankedLosses() + " ");
-        p2Msg.append(s2.getRankedWins() + " ");
-        p2Msg.append(s2.getRankedLosses() + " ");
-        p2Msg.append(s2.getTetrominoPoints() + " ");
-        p2Msg.append(s2.getTimePlayed() + " ");
-        p2Msg.append(match.getP2Pts() + " ");
-        p2Msg.append(match.getP2Time());
-
-        s1.sendStringData(p1Msg.toString());
-        s2.sendStringData(p2Msg.toString());
         match = null;
         matches.remove(matchId);
     }
