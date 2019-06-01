@@ -10,7 +10,7 @@ public class CreateAccount extends Command {
 
     private String username, passwd, email;
 
-    private int privilegeGroup, tetrominoPoints;
+    private int privilegeGroup, tetrominoPoints = 5000;
 
     private final int unrankedWins = 0, unrankedLosses = 0;
 
@@ -53,16 +53,19 @@ public class CreateAccount extends Command {
 
     private void createAccount() {
         // TODO: Show this query (contains transactions, )
-        final String query = "BEGIN;"
-                + "INSERT INTO `TetrisMP`.`users` VALUES (NULL, '" + this.username + "', '" + this.passwd + "'," +
-                " '" + this.email + "', NULL);" +
-                "INSERT INTO `TetrisMP`.`user_game_data` VALUES (NULL, (SELECT user_id FROM `TetrisMP`.`users` ORDER BY" +
-                " DESC LIMIT 1), " + this.privilegeGroup + ", " + this.tetrominoPoints + ", " + this.timePlayed + "," +
-                this.timePlayed + ", " + this.unrankedWins + ", " + this.unrankedLosses + ", " + this.rankedWins +
-                ", " + this.rankedLosses + ", " + this.elo + ");" +
-                "COMMIT;";
+        // "BEGIN;\r\n" +
+        final String query1 = // "BEGIN;\r\n" +
+                "INSERT INTO `TetrisMP`.`users` VALUES (NULL, '" + this.username + "', '" + this.passwd + "'," +
+                " '" + this.email + "', NULL);\r\n";
+        final String query2 =
+                "INSERT INTO `TetrisMP`.`user_game_data` (user_data_id, user_id, privilege_group, tetromino_points, " +
+                "time_played, unranked_wins, unranked_losses, ranked_wins, ranked_losses, elo)\r\n" +
+                "SELECT NULL, user_id, " + this.privilegeGroup + ", " + this.tetrominoPoints + ", " + this.timePlayed + ", " + this.unrankedWins + "," +
+                this.unrankedLosses + ", " + this.rankedWins + ", " + this.rankedLosses + ", " + this.elo + " FROM `TetrisMP`.`users` " +
+                "ORDER BY user_id DESC LIMIT 1;"; // + "\r\nCOMMIT;";
         try {
-            DBQueryManager.runSQLueryNoRet(query);
+            DBQueryManager.runSQLueryNoRet(query1);
+            DBQueryManager.runSQLueryNoRet(query2);
         } catch (SQLException e) {
             this.executionStatus = false;
             e.printStackTrace();
@@ -84,6 +87,6 @@ public class CreateAccount extends Command {
         this.passwd = null;
         this.email = null;
         this.privilegeGroup = -1;
-        this.tetrominoPoints = -1;
+        this.tetrominoPoints = 5000; // default
     }
 }

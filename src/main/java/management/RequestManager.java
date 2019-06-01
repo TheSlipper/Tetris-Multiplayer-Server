@@ -148,19 +148,15 @@ public class RequestManager {
      * @throws SQLException on incorrect sql query data input
      */
     private static boolean getUserData(StringTokenizer requestTokenized, int sessionId) throws SQLException {
-        // TODO: Nested MySQL query
+        // TODO: Show the nested MySQL query
         String username = requestTokenized.nextToken();
-        ResultSet rs = DBQueryManager.runSQLQuerry("SELECT user_id FROM `TetrisMP`.`users` WHERE "
-                + "username=\"" + username + "\"");
+        ResultSet rs = DBQueryManager.runSQLQuerry("SELECT * FROM `TetrisMP`.`user_game_data` WHERE user_id=(SELECT user_id FROM `TetrisMP`.`users` WHERE username='" + username + "')");
         rs.next();
-        String id = rs.getString("user_id");
-        rs = DBQueryManager.runSQLQuerry("SELECT * FROM `TetrisMP`.`user_game_data` WHERE "
-                + "user_id=" + id);
-        rs.next();
+
 
         Session s = SessionManager.getSession(sessionId);
         if (s.getDbUserNameId() == 0) {
-            s.setDbUsernameId(Integer.parseInt(id));
+            s.setDbUsernameId(rs.getInt("user_id"));
             s.setElo(rs.getInt("elo"));
             s.setPrivilegeGroup(rs.getInt("privilege_group"));
             s.setUnrankedWins(rs.getInt("unranked_wins"));
