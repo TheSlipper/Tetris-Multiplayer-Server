@@ -109,10 +109,11 @@ public class Session extends Thread {
     }
 
     public String getIp() {
-        if (this.connected)
-            return tcpClientSocket.getInetAddress().getAddress().toString();
+        if (!this.usesTcp && this.connected)
+            return this.ipAddress.getCanonicalHostName();
+
         else
-            return "[Not connected]";
+            return this.connected ? tcpClientSocket.getInetAddress().getCanonicalHostName() : "[Not connected]";
     }
 
     @Override

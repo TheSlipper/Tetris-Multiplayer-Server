@@ -86,7 +86,7 @@ public class CreateAccount extends Command {
         this.username = null;
         this.passwd = null;
         this.email = null;
-        this.privilegeGroup = -1;
+        this.privilegeGroup = 1;
         this.tetrominoPoints = 5000; // default
     }
 }

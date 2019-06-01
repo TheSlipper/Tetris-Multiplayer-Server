@@ -11,8 +11,6 @@ public class Man extends Command {
 
     private String manCmdName = "man";
 
-    private final String fileFormat = ".md";
-
     public Man(String cmdName) {
         super(cmdName);
     }
@@ -32,7 +30,7 @@ public class Man extends Command {
     }
 
     private String getMessage() throws IOException {
-        FileReader fr = new FileReader(this.manPath + this.manCmdName + this.fileFormat);
+        FileReader fr = new FileReader(this.manPath + this.manCmdName);
         BufferedReader bf = new BufferedReader(fr);
         StringBuilder sb = new StringBuilder();
         String helper = null;

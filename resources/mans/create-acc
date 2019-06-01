@@ -1,0 +1,32 @@
+Tetris Multiplayer General Commands Manual
+
+NAME
+       create-acc - create a tetris multiplayer account from server's shell.
+
+SYNOPSIS
+       create-acc [--username USERNAME] [--password PASSWORD] [--email EMAIL] [--group-no GROUP_NUMBER] [--tetromino-pts POINTS]
+
+DESCRIPTION
+       create-acc - creates an account if the passed data is valid.
+
+       The following options are available:
+
+	--username <username>
+		Specifies the username of the new user
+       
+	--password <password>
+		Specifies the password of the new user
+
+	--email <email>
+		Specifies the mail of the new user
+
+	--group-no
+		Specifies the privilege group of the new user
+
+	--tetromino-pts
+		Specifies the tetromino points given to the new user
+
+	Although there are many other things that define the user's data (such as e.g. player's elo) it is not possible to change them.
+
+EXIT STATUS
+    The create-acc command returns true on success (and creates the user) or false if an error occurs.

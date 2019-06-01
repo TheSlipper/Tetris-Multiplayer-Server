@@ -1,0 +1,18 @@
+Tetris Multiplayer General Commands Manual
+
+NAME
+       clear - clear the shell screen.
+
+SYNOPSIS
+       clear [-l NUMBER_OF_LINES] [--lines NUMBER_OF_LINES]
+
+DESCRIPTION
+       clear - clears your screen if this is possible.
+       
+       The following options are available:
+       
+       -l, --lines=NUMBER_OF_LINES
+		Reads the amount of lines which should be printed to clear the screen.
+
+EXIT STATUS
+	The clear command exits true on success (and clears the screen) or false if an error occurs.

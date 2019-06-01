@@ -1,0 +1,24 @@
+Tetris Multiplayer General Commands Manual
+
+NAME
+	list - list all of the chosen information on the screen.
+
+SYNOPSIS
+	list [-cio]
+
+DESCRIPTION
+	list - For each operand that names a type of data list displays its name as well as the entity's id number.
+
+	The following options are available:
+       
+	-c
+		Lists all available commands and their id number.
+       
+	-i
+		Lists all of the sessions' ip numbers and their unique id.
+       
+	-o
+		Lists all of the sessions' operating systems and their unique id.
+
+EXIT STATUS
+	The list command exits with true on success (and prints the listing to the screen) or with false if an error occurs.

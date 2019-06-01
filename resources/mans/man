@@ -1,0 +1,13 @@
+Tetris Multiplayer General Commands Manual
+
+NAME
+	man - format and display the manual pages for a command.
+
+SYNOPSIS
+	man name
+
+DESCRIPTION
+	man - formats  and  displays the on-line manual pages for Tetris Multiplayer commands.
+
+EXIT STATUS
+	The man command exits true on success (and prints the formatted manual to the screen) or false if an error occurs.

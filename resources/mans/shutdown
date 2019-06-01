@@ -1,0 +1,26 @@
+Tetris Multiplayer General Commands Manual
+
+NAME
+	shutdown - close down the server at a given time
+
+SYNOPSIS
+       shutdown [-] [--] [-n] [-t SPECIFIED_TIME] [-s EXIT_STATUS]
+
+DESCRIPTION
+	The shutdown utility provides an automated shutdown procedure for superusers to nicely notify users when the system is shutting down, saving them from system administrators, hackers, and gurus, who would otherwise not bother with such niceties.
+       
+	The following options are available:
+       
+	-n                   shuts down the system now
+       
+	-t=SPECIFIED_TIME    
+		Shuts down the system after a given time in miliseconds
+       
+	-s=EXIT_STATUS
+		Shuts down the system with a given status number
+       
+	now
+		Shuts down the system now
+
+EXIT STATUS
+    The shutdown utility exits with true on success (and schedules the shutdown and the shutdown status) or exits with false if an error occurs.
