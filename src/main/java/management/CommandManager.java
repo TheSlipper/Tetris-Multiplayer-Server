@@ -34,7 +34,8 @@ public class CommandManager {
             new Ban("ban"),
             new Man("man"),
             new Clear("clear"),
-            new CreateAccount("create-acc")
+            new CreateAccount("create-acc"),
+            new DeleteAccount("delete-acc")
     };
 
     /**

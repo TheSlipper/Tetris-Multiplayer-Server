@@ -5,7 +5,6 @@ import management.DBQueryManager;
 import java.sql.SQLException;
 import java.util.StringTokenizer;
 
-// TODO: A man page
 public class CreateAccount extends Command {
 
     private String username, passwd, email;

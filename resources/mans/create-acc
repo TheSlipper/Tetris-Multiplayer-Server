@@ -11,19 +11,19 @@ DESCRIPTION
 
        The following options are available:
 
-	--username <username>
+	--username=USERNAME
 		Specifies the username of the new user
        
-	--password <password>
+	--password=PASSWORD
 		Specifies the password of the new user
 
-	--email <email>
+	--email=EMAIL
 		Specifies the mail of the new user
 
-	--group-no
+	--group-no=GROUP_NUMBER
 		Specifies the privilege group of the new user
 
-	--tetromino-pts
+	--tetromino-pts=POINTS
 		Specifies the tetromino points given to the new user
 
 	Although there are many other things that define the user's data (such as e.g. player's elo) it is not possible to change them.

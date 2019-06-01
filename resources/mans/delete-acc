@@ -1,0 +1,33 @@
+Tetris Multiplayer General Commands Manual
+
+NAME
+       delete-acc - deletes a tetris multiplayer account from server's database.
+
+SYNOPSIS
+       delete-acc [-af] [--username USERNAME] [-u USERNAME] [--email EMAIL] [-e EMAIL] [--group-no GROUP_NUMBER] [-g GROUP_NUMBER] [--id ID_NUMBER] [-i ID_NUMBER]
+
+DESCRIPTION
+       delete-acc - Deletes one or more account with the specified criteria. This command forbids the deletion of root accounts unless the force command is used. That is implemented in order to reduce the risk of deleting all root accounts.
+
+       The following options are available:
+
+	-a
+		Sets all found users as targets of the delete operation.
+
+	-f
+		Forces the deletion of targeted user/s. 
+
+	-u, --username=USERNAME
+		Specifies the username of the user/s.
+
+	--email=EMAIL
+		Specifies the mail of the user/s.
+
+	--group-no=GROUP_NUMBER
+		Specifies the privilege group of the user/s.
+
+	-i, --id=ID_NUMBER
+		Specifies the id number of the user/s.
+
+EXIT STATUS
+    The delete-acc command returns true on success (and deletes the user/s) or false if an error occurs.
