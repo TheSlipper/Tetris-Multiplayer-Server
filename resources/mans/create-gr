@@ -1,0 +1,30 @@
+Tetris Multiplayer General Commands Manual
+
+NAME
+       create-gr - creates a new group in the tetris multiplayer database.
+
+SYNOPSIS
+       create-gr [-bprl] [--group-name GROUP_NAME]
+
+DESCRIPTION
+       create-gr - creates a new group in the tetris multiplayer database with the specified criteria.
+
+       The following options are available:
+
+	-b
+		Sets the ban user permission to true.
+
+	-p
+		Sets the post news permission to true. 
+
+	-r
+		Sets the reset user data permission to true.
+
+	-l
+		Sets the log in to server permission to true.
+
+	--group-name=GROUP_NAME
+		Specifies the group name.
+
+EXIT STATUS
+    The create-gr command returns true on success (and creates the group) or false if an error occurs.

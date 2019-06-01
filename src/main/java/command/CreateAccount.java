@@ -42,6 +42,23 @@ public class CreateAccount extends Command {
                     this.privilegeGroup = Integer.parseInt(nextToken);
                 else if (token.contains("tetromino-pts"))
                     this.tetrominoPoints = Integer.parseInt(nextToken);
+            } else if (token.startsWith("-")) {
+                // TODO: Add '-' arguments to manual
+                String nextToken = cmdTokenizer.nextToken();
+                if (nextToken.startsWith("-")) {
+                    System.err.println("[Incorrect token value: " + nextToken + " for " + token + " token]");
+                    this.executionStatus = false;
+                }
+                else if (token.contains("u"))
+                    this.username = nextToken;
+                else if (token.contains("p"))
+                    this.passwd = nextToken;
+                else if (token.contains("e"))
+                    this.email = nextToken;
+                else if (token.contains("g")) // TODO: group-name
+                    this.privilegeGroup = Integer.parseInt(nextToken);
+                else if (token.contains("t"))
+                    this.tetrominoPoints = Integer.parseInt(nextToken);
                 else {
                     System.err.println("[Incorrect token: " + token + " ]");
                     this.executionStatus = false;
@@ -51,9 +68,8 @@ public class CreateAccount extends Command {
     }
 
     private void createAccount() {
-        // TODO: Show this query (contains transactions, )
-        // "BEGIN;\r\n" +
-        final String query1 = // "BEGIN;\r\n" +
+        // TODO: Show this query (contains select nested query inside of an insert query)
+        final String query1 =
                 "INSERT INTO `TetrisMP`.`users` VALUES (NULL, '" + this.username + "', '" + this.passwd + "'," +
                 " '" + this.email + "', NULL);\r\n";
         final String query2 =

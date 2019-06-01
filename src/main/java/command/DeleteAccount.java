@@ -82,18 +82,18 @@ public class DeleteAccount extends Command {
     }
 
     private void findAndDisplayUsers() throws SQLException {
-        // TODO: Show off the inner join
+        // TODO: Show off the inner join and REGEXP
         boolean prevAppended = false;
         StringBuilder searchQuery = new StringBuilder();
         searchQuery.append("SELECT * FROM `TetrisMP`.`users` INNER JOIN `TetrisMP`.`user_game_data` ON users.user_id=user_game_data.user_id WHERE ");
         if (this.usernameTag) {
-            searchQuery.append("users.username='" + this.username + "'");
+            searchQuery.append("users.username REGEXP '" + this.username + "'");
             prevAppended = true;
         }
         if (this.emailTag) {
             if (prevAppended)
                 searchQuery.append(" AND ");
-            searchQuery.append("users.email='" + this.emailTag + "'");
+            searchQuery.append("users.email REGEXP '" + this.email + "'");
         }
         if (this.idTag) {
             if (prevAppended)
@@ -107,9 +107,14 @@ public class DeleteAccount extends Command {
         }
 
         ResultSet rs = DBQueryManager.runSQLQuerry(searchQuery.toString());
+        if (!rs.next()) {
+            System.err.println("No results found");
+            this.executionStatus = false;
+            return;
+        }
         System.err.println("[Warning]");
         System.out.println("You are about to delete that user/those users: ");
-        while (rs.next()) {
+        do {
             this.targetIds.add(rs.getInt("users.user_id"));
             System.out.printf("User's Id: %s; Group: %s; Username: %s; Email: %s; Registration Date: %s\r\n",
                     rs.getString("users.user_id"),
@@ -119,7 +124,7 @@ public class DeleteAccount extends Command {
                     rs.getString("users.registration_date"));
             if (!this.allResultsFlag)
                 break;
-        }
+        } while (rs.next());
         System.out.print("Are you really sure you want to delete them y/n: ");
         if (!this.forceFlag && !new Scanner(System.in).nextLine().startsWith("y"))
             this.executionStatus = false;

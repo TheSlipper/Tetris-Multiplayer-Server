@@ -35,7 +35,8 @@ public class CommandManager {
             new Man("man"),
             new Clear("clear"),
             new CreateAccount("create-acc"),
-            new DeleteAccount("delete-acc")
+            new DeleteAccount("delete-acc"),
+            new CreateGroup("create-gr")
     };
 
     /**
