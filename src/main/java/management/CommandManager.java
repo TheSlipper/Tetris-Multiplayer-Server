@@ -16,6 +16,7 @@ import java.util.StringTokenizer;
  *     <li>ban - bans specified client</li>
  *     <li>man - displays an extensive manual of a specified command</li>
  *     <li>clear - cleans the screen</li>
+ *     <li>create-acc - creates a new account</li>
  * </ul>
  *
  * @author Kornel Domeradzki
@@ -32,7 +33,8 @@ public class CommandManager {
             new Disconnect("disconnect"),
             new Ban("ban"),
             new Man("man"),
-            new Clear("clear")
+            new Clear("clear"),
+            new CreateAccount("create-acc")
     };
 
     /**

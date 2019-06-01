@@ -6,6 +6,8 @@ public abstract class Command {
 
     private String commandName;
 
+    protected boolean executionStatus = true;
+
     public Command(String cmdName) {
         this.commandName = cmdName;
     }

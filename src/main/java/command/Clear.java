@@ -31,5 +31,6 @@ public class Clear extends Command {
     }
 
     protected void clearFlags() {
+        this.lines = 40;
     }
 }
