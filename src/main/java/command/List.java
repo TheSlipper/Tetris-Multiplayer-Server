@@ -1,11 +1,13 @@
 package command;
 
+import management.DBQueryManager;
 import management.SessionManager;
 import management.CommandManager;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.StringTokenizer;
 
-// TODO: 1. Fix the ip output
 public class List extends Command {
 
     private boolean cmdFlag = true;
@@ -14,11 +16,13 @@ public class List extends Command {
 
     private boolean osFlag = false;
 
+    private boolean usersFlag = false;
+
     public List(String cmdName) {
         super(cmdName);
     }
 
-    private void output() {
+    private void output() throws SQLException {
         // CMDs
         if (cmdFlag) {
             int index = 0;
@@ -43,6 +47,16 @@ public class List extends Command {
                 System.out.print("os: "); // TODO: Implement OS and build info
             System.out.println();
         }
+
+        // Users
+        if (this.usersFlag) {
+            System.out.println("[Users]");
+            System.out.println("[Format: User's ID; Nickname; Email; Registration Date]");
+            ResultSet rs = DBQueryManager.runSQLQuerry("SELECT * FROM `TetrisMP`.`users`");
+            while (rs.next()) {
+                System.out.printf("[%d]     %s     %s     %s\r\n", rs.getInt("user_id"), rs.getString("username"), rs.getString("email"), rs.getString("registration_date"));
+            }
+        }
     }
 
     protected void loadFlags(StringTokenizer cmdTokenizer) {
@@ -55,6 +69,8 @@ public class List extends Command {
                     this.ipFlag = true;
                 if (token.contains("o")) // o - OS output
                     this.osFlag = true;
+                if (token.contains("u"))
+                    this.usersFlag = true;
             }
         }
     }
@@ -65,13 +81,20 @@ public class List extends Command {
             this.cmdFlag = false;
             this.loadFlags(cmdTokenizer);
         }
-        this.output();
-        return true;
+        try {
+            this.output();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            this.executionStatus = false;
+        }
+        return this.executionStatus;
     }
 
     protected void clearFlags() {
+        this.executionStatus = true;
         this.cmdFlag = true;
         this.ipFlag = false;
         this.osFlag = false;
+        this.usersFlag = false;
     }
 }

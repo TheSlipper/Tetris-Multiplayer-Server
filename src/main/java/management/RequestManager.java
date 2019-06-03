@@ -119,8 +119,13 @@ public class RequestManager {
      * @throws SQLException on incorrect sql query data input
      */
     private static boolean logIn(StringTokenizer requestTokenized, int sessionId) throws SQLException {
-        String login = requestTokenized.nextToken();
-        boolean execStatus = execStatus = DBQueryManager.areLoginCredentialsValid(login, requestTokenized.nextToken());
+        final String ver = requestTokenized.nextToken();
+        final String os = requestTokenized.nextToken();
+        final String login = requestTokenized.nextToken();
+        boolean execStatus = DBQueryManager.areLoginCredentialsValid(login, requestTokenized.nextToken());
+        ResultSet rs = DBQueryManager.runSQLQuerry("SELECT * FROM `TetrisMP`.`users` WHERE username='" + login + "'");
+        rs.next();
+        DBQueryManager.runSQLueryNoRet("INSERT INTO `login_attempts` (`login_attempt_id`, `login_user_id`, `login_attempt_date`, `login_attempt_status`, `login_attempt_os`, `login_attempt_build`) VALUES (NULL, '" + rs.getString("user_id") + "', CURRENT_TIMESTAMP, '" + (execStatus ? "1" : "0") + "', '" + os + "', '" + ver + "')");
         if (!execStatus)
             ResponseManager.processResponse("INCORRECT_CREDENTIALS " + login, sessionId);
         else
