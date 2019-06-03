@@ -2,6 +2,7 @@ package connection;
 
 import management.DBQueryManager;
 import management.MatchManager;
+import management.SessionManager;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -63,7 +64,6 @@ public class Match {
     }
 
     public void updateField(int sessionId, String fieldData) {
-        System.out.println("Field Data of session " + sessionId + ": " + fieldData);
         if (sessionId == this.p1Session.getSessionId())
             this.p1FieldData = fieldData.substring(1);
         else
