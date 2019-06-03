@@ -10,13 +10,15 @@ import java.util.StringTokenizer;
  *
  * <b>List of available commands: </b>
  * <ul>
- *     <li>list - lists the specified entities</li>
+ *     <li>ls - lists the specified entities</li>
  *     <li>shutdown - gently shuts down the system</li>
  *     <li>disconnect - disconnects a specified client</li>
  *     <li>ban - bans specified client</li>
  *     <li>man - displays an extensive manual of a specified command</li>
  *     <li>clear - cleans the screen</li>
  *     <li>create-acc - creates a new account</li>
+ *     <li>delete-acc - deletes an account</li>
+ *     <li>create-gr - creates a group</li>
  * </ul>
  *
  * @author Kornel Domeradzki
@@ -28,7 +30,7 @@ public class CommandManager {
 
     /** Array of all available commands */
     public static Command[] commandArr = {
-            new List("list"),
+            new List("ls"),
             new Shutdown("shutdown"),
             new Disconnect("disconnect"),
             new Ban("ban"),
@@ -36,7 +38,8 @@ public class CommandManager {
             new Clear("clear"),
             new CreateAccount("create-acc"),
             new DeleteAccount("delete-acc"),
-            new CreateGroup("create-gr")
+            new CreateGroup("create-gr"),
+            new CreateLog("create-log")
     };
 
     /**
