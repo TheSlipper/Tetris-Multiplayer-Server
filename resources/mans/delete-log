@@ -1,0 +1,18 @@
+Tetris Multiplayer General Commands Manual
+
+NAME
+       delete-log - deletes a tetris multiplayer update log from the server's database.
+
+SYNOPSIS
+       delete-log [--id LOG_ID] [-i LOG_ID]
+
+DESCRIPTION
+       delete-log - Deletes one log with the specified id.
+
+       The following options are available:
+
+	-i, --id=LOG_ID
+		Deletes an update log with the given log id.
+
+EXIT STATUS
+    The delete-log command returns true on success (and deletes the log) or false if an error occurs.

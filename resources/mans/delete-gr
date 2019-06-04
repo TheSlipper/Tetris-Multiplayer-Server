@@ -1,0 +1,21 @@
+Tetris Multiplayer General Commands Manual
+
+NAME
+       delete-gr - deletes a tetris multiplayer group from the server's database.
+
+SYNOPSIS
+       delete-gr [--name GROUP_NAME] [-n GROUP_NAME] [--id GROUP_ID] [-i GROUP_ID]
+
+DESCRIPTION
+       delete-gr - Deletes one or more group with the specified criteria. Regular expressions can be used for the group name.
+
+       The following options are available:
+
+	-n, --name=GROUP_NAME
+		Sets all the found groups as targets of the delete operation.
+
+	-i, --id=GROUP_ID=GROUP_ID
+		Deletes a group with the given group id.
+
+EXIT STATUS
+    The delete-gr command returns true on success (and deletes the group/s) or false if an error occurs.

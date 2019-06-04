@@ -19,6 +19,7 @@ import java.util.StringTokenizer;
  *     <li>create-acc - creates a new account</li>
  *     <li>delete-acc - deletes an account</li>
  *     <li>create-gr - creates a group</li>
+ *     <li>delete-log - deletes a log</li>
  * </ul>
  *
  * @author Kornel Domeradzki
@@ -39,7 +40,9 @@ public class CommandManager {
             new CreateAccount("create-acc"),
             new DeleteAccount("delete-acc"),
             new CreateGroup("create-gr"),
-            new CreateLog("create-log")
+            new CreateLog("create-log"),
+            new DeleteGroup("delete-gr"),
+            new DeleteLog("delete-log")
     };
 
     /**
