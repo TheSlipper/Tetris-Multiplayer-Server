@@ -166,7 +166,7 @@ public class DeleteAccount extends Command {
 
     @Override
     protected void clearFlags() {
-        this.targetIds = new ArrayList<>();
+        this.targetIds = new ArrayList<Integer>();
         this.executionStatus = true;
         this.usernameTag = false;
         this.emailTag = false;

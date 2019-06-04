@@ -4,3 +4,6 @@ target/
 .DS_Store
 out/
 src/main/main.iml
+resources/#report-template.tex#
+resources/.#report-template.tex
+resources/report-template~
