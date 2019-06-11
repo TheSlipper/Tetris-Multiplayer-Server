@@ -66,6 +66,14 @@ public class Session extends Thread {
         this.connected = true;
     }
 
+//    private static int getStrChecksum(final String str, int strLen) {
+//        int chk = 0;
+//        for (int i = 0; i < strLen; i++)
+//            chk -= (int)str.charAt(i);
+//
+//        return chk/str.length();
+//    }
+
     private void tcpRead() throws IOException {
         if (!this.usesTcp) {
             this.udpRead();
@@ -92,11 +100,17 @@ public class Session extends Thread {
         this.udpClientSocket.receive(datagramPacket);
         String content = new String(datagramPacket.getData());
 
+
+        // TODO: Checksum maybe
         for (int i = 0; i < content.length(); i++) {
-            System.out.print((int)content.charAt(i) + ", ");
             if (content.charAt(i) == (char)0)
                 content = content.substring(0, i);
         }
+
+        DatagramPacket dp = new DatagramPacket("OK".getBytes(), "OK".length(), this.ipAddress, 7000);
+        this.udpClientSocket.send(dp);
+
+//        System.out.println(Session.getStrChecksum(content, content.length()));
 
         if (!content.equals("") && !RequestManager.processRequest(content, this.sessionId))
             System.err.println("\r\n[Error in communication between host and the client]");
@@ -149,16 +163,25 @@ public class Session extends Thread {
     }
 
     public boolean sendStringData(String data) throws IOException {
+        boolean execStatus = false;
         if (this.usesTcp) {
             bufferedOutputStream.write(data.getBytes(), 0, data.length());
             bufferedOutputStream.flush();
-            return true;
+            execStatus = true;
         } else {
-            // TODO: Package data sent validation
-            DatagramPacket dp = new DatagramPacket(data.getBytes(), data.length(), this.ipAddress, 7000);
-            this.udpClientSocket.send(dp);
-            return true;
+            while (!execStatus) {
+                // TODO: Checksum maybe
+                DatagramPacket dp = new DatagramPacket(data.getBytes(), data.length(), this.ipAddress, 7000);
+                this.udpClientSocket.send(dp);
+
+                byte[] byteArr = new byte[2];
+                DatagramPacket dp2 = new DatagramPacket(byteArr, 0, byteArr.length);
+                this.udpClientSocket.receive(dp2);
+                execStatus = new String(dp2.getData()).equals("OK");
+            }
         }
+
+        return execStatus;
     }
 
     public boolean isConnected() {
