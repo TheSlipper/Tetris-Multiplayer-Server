@@ -95,6 +95,7 @@ public class DBQueryManager {
     public static boolean areLoginCredentialsValid(String login, String passwd) throws SQLException {
         String query = "SELECT user_id FROM `TetrisMP`.`users` WHERE username='"
                 + login + "' AND user_password='" + passwd + "'";
+        System.out.println(query);
         ResultSet myRs = DBQueryManager.runSQLQuerry(query);
         return myRs.next();
     }

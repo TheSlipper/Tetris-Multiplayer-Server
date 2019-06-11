@@ -12,7 +12,7 @@ public class UDPServerSocket {
 
     private final String PORT_ALLOCATION_RESPONSE = "PORT_ALLOCATED";
 
-    private final String PORT_ALLOCATION_REQUEST = "PORT_ALL_REQ";
+    private final String PORT_ALLOCATION_REQUEST = "PORT_ALLOC_REQ";
 
     private final int GAME_PORT = 7000;
 

@@ -92,6 +92,12 @@ public class Session extends Thread {
         this.udpClientSocket.receive(datagramPacket);
         String content = new String(datagramPacket.getData());
 
+        for (int i = 0; i < content.length(); i++) {
+            System.out.print((int)content.charAt(i) + ", ");
+            if (content.charAt(i) == (char)0)
+                content = content.substring(0, i);
+        }
+
         if (!content.equals("") && !RequestManager.processRequest(content, this.sessionId))
             System.err.println("\r\n[Error in communication between host and the client]");
     }
